@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { cv as apiCv, cvVacio, MODO_DEMOSTRACION } from '../api';
+import { cv as apiCv, cvVacio } from '../api';
 import Tarjeta from '../components/Tarjeta';
 import Boton from '../components/Boton';
 
@@ -105,12 +105,11 @@ function NuevoCv() {
           {importando ? 'Leyendo tu perfil…' : 'Subir el PDF de LinkedIn'}
         </Boton>
 
-        {MODO_DEMOSTRACION && (
-          <p className="mt-3 text-xs leading-relaxed text-texto-tenue">
-            En modo demostración el archivo no se procesa: se cargan datos de ejemplo para que
-            puedas recorrer la pantalla. La lectura real del PDF se hace en el backend.
-          </p>
-        )}
+        <p className="mt-3 text-xs leading-relaxed text-texto-tenue">
+          El texto se lee de verdad desde tu PDF, ahí mismo en tu navegador (no se manda a
+          ningún servidor). Es un borrador: puede no separar perfecto cada dato si tu PDF tiene
+          un formato distinto al habitual — revisalo antes de guardar.
+        </p>
       </Tarjeta>
 
       {/* Empezar de cero */}

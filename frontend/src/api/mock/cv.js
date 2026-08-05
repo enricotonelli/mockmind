@@ -281,71 +281,88 @@ function veredictoDe(puntaje) {
 // aprobado. La vía que sí funciona es que el usuario exporte su propio perfil
 // como PDF desde LinkedIn (botón "Más" → "Guardar como PDF") y lo suba acá.
 //
-// En modo demostración no se procesa el archivo: se devuelven datos de ejemplo
-// para poder recorrer la pantalla. La extracción real se implementa en el
-// backend cuando se conecte.
+// El texto se extrae de verdad con pdf.js, corriendo en el navegador (nada de
+// esto pasa por un servidor). Repartir ese texto en campos (qué línea es el
+// puesto, cuál la empresa) es una heurística sobre el formato habitual de
+// LinkedIn, calibrada contra una exportación real: no hay garantía de que
+// funcione perfecto con cualquier variante de layout, así que sigue siendo
+// un borrador para revisar, no una importación 100% automática.
+//
+// Si el PDF no tiene texto extraíble (por ejemplo, es un escaneo de imagen)
+// se cae a los datos de ejemplo, para que la pantalla siga siendo recorrible.
+
+const DATOS_DE_EJEMPLO = {
+  nombre: 'Enrico Tonelli',
+  titular: 'Estudiante de Ingeniería en Informática',
+  email: 'enrico.tonelli@ejemplo.com',
+  telefono: '+54 11 5555 5555',
+  ubicacion: 'Buenos Aires, Argentina',
+  linkedin: 'linkedin.com/in/ejemplo',
+  resumen:
+    'Estudiante avanzado de Ingeniería en Informática con experiencia en desarrollo web. ' +
+    'Trabajé en proyectos de gestión interna usando JavaScript, React y Node.js. ' +
+    'Busco un puesto donde poder crecer técnicamente y asumir responsabilidad sobre un producto.',
+  experiencias: [
+    {
+      ...experienciaVacia(),
+      puesto: 'Desarrollador Web Junior',
+      empresa: 'Consultora de Sistemas',
+      desde: '2023',
+      hasta: '',
+      actual: true,
+      descripcion:
+        'Desarrollé módulos del sistema de gestión interna usando React y Node.js. ' +
+        'Reduje en un 40% el tiempo de carga del panel principal optimizando las consultas a la base de datos.',
+    },
+    {
+      ...experienciaVacia(),
+      puesto: 'Pasante de Soporte Técnico',
+      empresa: 'Estudio Contable',
+      desde: '2022',
+      hasta: '2023',
+      actual: false,
+      descripcion:
+        'Atención de incidentes de los usuarios internos y tareas de mantenimiento de los equipos.',
+    },
+  ],
+  educacion: [
+    {
+      ...educacionVacia(),
+      titulo: 'Ingeniería en Informática',
+      institucion: 'Universidad del Salvador (USAL)',
+      desde: '2021',
+      hasta: '',
+      enCurso: true,
+    },
+  ],
+  habilidades: ['JavaScript', 'React', 'Node.js', 'PostgreSQL', 'Git', 'Express'],
+  idiomas: [
+    { idioma: 'Español', nivel: 'Nativo' },
+    { idioma: 'Inglés', nivel: 'Intermedio' },
+  ],
+};
 
 export async function importarDesdeLinkedin(archivo) {
-  await demorar(1600);
-
   if (!archivo) throw new Error('Elegí el PDF que exportaste de LinkedIn.');
   if (!archivo.name.toLowerCase().endsWith('.pdf')) {
     throw new Error('El archivo tiene que ser el PDF que exporta LinkedIn.');
   }
 
+  const { extraerCvDePdf } = await import('./extraccionLinkedin');
+  const extraido = await extraerCvDePdf(archivo).catch(() => null);
+
+  if (!extraido) {
+    await demorar(600);
+    return { ...cvVacio(), ...DATOS_DE_EJEMPLO };
+  }
+
   return {
     ...cvVacio(),
-    nombre: 'Enrico Tonelli',
-    titular: 'Estudiante de Ingeniería en Informática',
-    email: 'enrico.tonelli@ejemplo.com',
-    telefono: '+54 11 5555 5555',
-    ubicacion: 'Buenos Aires, Argentina',
-    linkedin: 'linkedin.com/in/ejemplo',
-    resumen:
-      'Estudiante avanzado de Ingeniería en Informática con experiencia en desarrollo web. ' +
-      'Trabajé en proyectos de gestión interna usando JavaScript, React y Node.js. ' +
-      'Busco un puesto donde poder crecer técnicamente y asumir responsabilidad sobre un producto.',
-    experiencias: [
-      {
-        ...experienciaVacia(),
-        puesto: 'Desarrollador Web Junior',
-        empresa: 'Consultora de Sistemas',
-        desde: '2023',
-        hasta: '',
-        actual: true,
-        descripcion:
-          'Desarrollé módulos del sistema de gestión interna usando React y Node.js. ' +
-          'Reduje en un 40% el tiempo de carga del panel principal optimizando las consultas a la base de datos.',
-      },
-      {
-        ...experienciaVacia(),
-        puesto: 'Pasante de Soporte Técnico',
-        empresa: 'Estudio Contable',
-        desde: '2022',
-        hasta: '2023',
-        actual: false,
-        // A propósito queda floja (sin números ni verbo de acción): así el
-        // análisis ATS tiene algo real para señalar, como pasa con la mayoría
-        // de los perfiles de LinkedIn.
-        descripcion:
-          'Atención de incidentes de los usuarios internos y tareas de mantenimiento de los equipos.',
-      },
-    ],
-    educacion: [
-      {
-        ...educacionVacia(),
-        titulo: 'Ingeniería en Informática',
-        institucion: 'Universidad del Salvador (USAL)',
-        desde: '2021',
-        hasta: '',
-        enCurso: true,
-      },
-    ],
-    habilidades: ['JavaScript', 'React', 'Node.js', 'PostgreSQL', 'Git', 'Express'],
-    idiomas: [
-      { idioma: 'Español', nivel: 'Nativo' },
-      { idioma: 'Inglés', nivel: 'Intermedio' },
-    ],
+    ...extraido,
+    experiencias: extraido.experiencias.length
+      ? extraido.experiencias
+      : DATOS_DE_EJEMPLO.experiencias,
+    educacion: extraido.educacion.length ? extraido.educacion : DATOS_DE_EJEMPLO.educacion,
   };
 }
 
