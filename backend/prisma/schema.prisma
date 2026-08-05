@@ -1,0 +1,74 @@
+// Schema de la base de datos de MockMind — Módulo 1 (motor de entrevistas)
+// Ver CLAUDE.md §6 para la definición funcional de cada tabla.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TipoEntrevista {
+  RRHH
+  Tecnica
+  Estres
+}
+
+enum RolMensaje {
+  usuario
+  entrevistador
+}
+
+model Usuario {
+  id            Int      @id @default(autoincrement())
+  nombre        String
+  email         String   @unique
+  password      String
+  fechaRegistro DateTime @default(now()) @map("fecha_registro")
+  sesiones      Sesion[]
+
+  @@map("usuarios")
+}
+
+model Sesion {
+  id             Int                @id @default(autoincrement())
+  usuarioId      Int                @map("id_usuario")
+  usuario        Usuario            @relation(fields: [usuarioId], references: [id])
+  puestoAplicado String             @map("puesto_aplicado")
+  tipoEntrevista TipoEntrevista     @map("tipo_entrevista")
+  fecha          DateTime           @default(now())
+  duracion       Int?
+  puntajeGeneral Float?             @map("puntaje_general")
+  mensajes       Mensaje[]
+  reporte        ReporteEntrevista?
+
+  @@map("sesiones")
+}
+
+model Mensaje {
+  id        Int        @id @default(autoincrement())
+  sesionId  Int        @map("id_sesion")
+  sesion    Sesion     @relation(fields: [sesionId], references: [id])
+  rol       RolMensaje
+  contenido String
+  timestamp DateTime   @default(now())
+
+  @@map("mensajes")
+}
+
+model ReporteEntrevista {
+  id                  Int    @id @default(autoincrement())
+  sesionId            Int    @unique @map("id_sesion")
+  sesion              Sesion @relation(fields: [sesionId], references: [id])
+  puntajeClaridad     Float  @map("puntaje_claridad")
+  puntajeStar         Float  @map("puntaje_star")
+  puntajeEjemplos     Float  @map("puntaje_ejemplos")
+  puntajeCoherencia   Float  @map("puntaje_coherencia")
+  cantidadRepreguntas Int    @map("cantidad_repreguntas")
+  feedbackTexto       String @map("feedback_texto")
+  sugerencias         String
+
+  @@map("reportes_entrevista")
+}
