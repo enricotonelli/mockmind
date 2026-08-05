@@ -31,7 +31,28 @@ export const PLANTILLAS = [
     recomendada: 'Para empresas tradicionales: bancos, estudios, administración pública.',
     aptaAts: true,
   },
+  {
+    id: 'harvard',
+    nombre: 'Harvard',
+    descripcion:
+      'El formato que recomiendan la mayoría de los centros de carrera universitarios: nombre centrado, títulos con línea fina, y la formación académica antes que la experiencia.',
+    recomendada: 'Para perfiles junior, pasantías, o cuando tu formación es un diferencial fuerte.',
+    aptaAts: true,
+  },
+  {
+    id: 'funcional',
+    nombre: 'Funcional',
+    descripcion:
+      'Pone tus habilidades justo después del perfil, antes que el historial laboral. Pensado para quienes cambian de rubro.',
+    recomendada: 'Para un cambio de carrera, o cuando tu último puesto no es lo más relevante para lo que buscás ahora.',
+    aptaAts: true,
+  },
 ];
+
+// Todas las plantillas van en una sola columna y con texto real (nada de
+// tablas, fotos ni gráficos): es la condición para que un sistema
+// automático de selección las pueda leer. Ver VistaPreviaCv.jsx para el
+// detalle visual y el orden de secciones de cada una.
 
 export function cvVacio() {
   return {
