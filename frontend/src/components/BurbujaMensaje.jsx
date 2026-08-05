@@ -7,8 +7,8 @@ function BurbujaMensaje({ mensaje }) {
   if (esUsuario) {
     return (
       <div className="animar-subir flex justify-end">
-        <div className="max-w-[85%] rounded-2xl rounded-br-md bg-superficie-alt px-4 py-3 sm:max-w-[75%]">
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-texto">
+        <div className="min-w-0 max-w-[85%] rounded-2xl rounded-br-md bg-superficie-alt px-4 py-3 sm:max-w-[75%]">
+          <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-texto">
             {mensaje.contenido}
           </p>
         </div>
@@ -31,7 +31,7 @@ function BurbujaMensaje({ mensaje }) {
             Repregunta
           </span>
         )}
-        <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-texto">
+        <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-texto">
           {mensaje.contenido}
         </p>
       </div>

@@ -16,8 +16,8 @@
     --texto: 31 30 29;
     --texto-suave: 107 106 101;
     --texto-tenue: 154 152 145;
-    --acento: 201 100 66;
-    --acento-suave: 244 226 218;
+    --acento: 12 35 64;
+    --acento-suave: 219 228 240;
     --acento-texto: 255 255 255;
     --exito: 90 138 100;
     --alerta: 190 145 62;
@@ -33,9 +33,12 @@
     --texto: 245 244 238;
     --texto-suave: 168 166 159;
     --texto-tenue: 128 126 120;
-    --acento: 217 119 87;
-    --acento-suave: 72 51 43;
-    --acento-texto: 26 25 24;
+    /* En modo oscuro el azul #0C2340 queda casi invisible sobre el fondo, así
+       que los textos y las etiquetas usan una versión aclarada de la misma
+       familia. Los rellenos sólidos siguen siendo el azul de marca. */
+    --acento: 125 164 209;
+    --acento-suave: 28 45 68;
+    --acento-texto: 12 35 64;
     --exito: 124 172 133;
     --alerta: 214 176 100;
   }

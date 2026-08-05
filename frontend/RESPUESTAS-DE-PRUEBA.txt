@@ -1,0 +1,249 @@
+===============================================================================
+MOCKMIND - RESPUESTAS DE PRUEBA PARA EL MODO DEMOSTRACION
+===============================================================================
+
+Este archivo es una ayuda para probar el frontend mientras no hay backend.
+Son respuestas listas para copiar y pegar en el chat de la entrevista.
+
+Cada bloque esta pensado para que el entrevistador simulado AVANCE a la
+siguiente pregunta en vez de repreguntar.
+
+
+-------------------------------------------------------------------------------
+COMO DECIDE EL ENTREVISTADOR SIMULADO SI AVANZA O REPREGUNTA
+-------------------------------------------------------------------------------
+
+La logica esta en: src/api/mock/entrevistador.js
+
+Para que AVANCE, tu respuesta tiene que cumplir las tres condiciones:
+
+  1) Tener 15 palabras o mas.
+     Menos de 15 palabras -> repregunta "Es una respuesta breve..."
+
+  2) Incluir un ejemplo concreto. Alcanza con que aparezca un numero
+     (2019, 3 personas, 40%) o alguna de estas expresiones:
+       "por ejemplo"      "una vez"          "en mi trabajo"
+       "en la empresa"    "el ano pasado"    "cuando trabajaba"
+       "un caso"          "me paso"          "tuve que"
+       "recuerdo"         "en un proyecto"   "especificamente"
+       "concretamente"
+     Sin ejemplo -> repregunta "Me ayudaria un caso puntual..."
+
+  3) Si la respuesta tiene 25 palabras o mas, cerrar con el resultado.
+     Alcanza con alguna de estas expresiones:
+       "logramos"     "logre"        "conseguimos"    "resultado"
+       "terminamos"   "mejoro"       "aumento"        "redujo"
+       "reduje"       "se resolvio"  "entregamos"     "gracias a eso"
+       "como consecuencia"           "al final"
+     Sin resultado -> repregunta "Y cual fue el resultado final?"
+
+  Ademas: si usas dos o mas muletillas vagas ("creo que", "mas o menos",
+  "depende", "no se", "supongo", "en general", "a veces") y no diste ningun
+  ejemplo, repregunta por vaguedad.
+
+  Tope: como maximo 2 repreguntas seguidas por pregunta. A la tercera avanza
+  igual, para no dejarte trabado.
+
+La entrevista tiene 6 preguntas. Al responder la sexta se cierra sola y va
+directo al reporte.
+
+
+===============================================================================
+ENTREVISTA DE RRHH
+===============================================================================
+
+--- Pregunta 1: "Contame un poco sobre vos y tu recorrido profesional" ---
+
+Soy tecnico en informatica y hace 4 anos que trabajo en desarrollo de software.
+Empece en una consultora chica haciendo soporte, y cuando trabajaba ahi me
+ofrecieron pasar al equipo de desarrollo. Desde 2022 estoy en una empresa de
+logistica a cargo del modulo de facturacion, y al final termine liderando ese
+proyecto con dos personas a cargo.
+
+
+--- Pregunta 2: "Por que te interesa el puesto?" ---
+
+Me interesa porque en mi trabajo actual ya vengo haciendo tareas parecidas pero
+sin la escala que tiene esta empresa. Por ejemplo, el ano pasado migramos el
+sistema de reportes y ahi me di cuenta de que lo que mas me gusta es resolver
+problemas de arquitectura. Gracias a eso decidi buscar un puesto con mas
+responsabilidad tecnica.
+
+
+--- Pregunta 3: "Contame sobre un logro del que estes orgulloso" ---
+
+En un proyecto de 2023 nos pidieron reducir el tiempo de carga del sistema, que
+tardaba casi 30 segundos. Tuve que analizar las consultas a la base y reescribi
+las cinco mas pesadas agregando indices. Termine bajando el tiempo a menos de 4
+segundos y como consecuencia dejaron de llegar reclamos del area comercial.
+
+
+--- Pregunta 4: "Un conflicto con un companero o tu jefe" ---
+
+Una vez tuve una discusion fuerte con un companero porque el queria reescribir
+todo el modulo desde cero y yo proponia arreglarlo por partes. Tuve que frenar
+la discusion y le propuse medir cuanto tardaba cada opcion. Al final hicimos la
+prueba, entregamos la version por partes en tres semanas y quedamos los dos
+conformes con la decision.
+
+
+--- Pregunta 5: "Tu principal debilidad" ---
+
+Mi debilidad mas clara es que me cuesta delegar. En mi trabajo actual, cuando
+arranco un proyecto tiendo a querer revisar cada detalle yo mismo. Por ejemplo
+en el ultimo trimestre me di cuenta de que estaba siendo un cuello de botella
+para el equipo, asi que empece a repartir tareas completas y el resultado fue
+que entregamos mas rapido.
+
+
+--- Pregunta 6: "Un error importante que hayas cometido" ---
+
+Recuerdo que en 2022 subi a produccion un cambio sin probarlo bien y dejamos el
+sistema de pagos caido casi 2 horas. Tuve que avisar enseguida a mi jefe y
+revertir el cambio. Despues armamos un checklist de despliegue obligatorio y
+gracias a eso no volvimos a tener un incidente parecido.
+
+
+===============================================================================
+ENTREVISTA TECNICA
+===============================================================================
+
+--- Pregunta 1: "El proyecto tecnico mas complejo en el que participaste" ---
+
+En un proyecto de 2023 tuve que integrar nuestro sistema con la API de una
+empresa de logistica que manejaba 5000 envios por dia. Mi rol fue disenar la
+sincronizacion y manejar los errores de red. Terminamos procesando todo sin
+perdida de datos y el resultado fue que redujo los reclamos por envios sin
+seguimiento.
+
+
+--- Pregunta 2: "Que herramientas y tecnologias usas y por que" ---
+
+Trabajo principalmente con JavaScript, React y Node, y para bases de datos uso
+PostgreSQL. Los elegi porque en mi trabajo ya teniamos ese stack y me permitia
+moverme entre el frontend y el backend. Por ejemplo el ano pasado tuve que
+resolver un problema de rendimiento en las consultas, y gracias a eso lo
+terminamos en la mitad del tiempo estimado.
+
+
+--- Pregunta 3: "Como encaras un problema que nunca resolviste" ---
+
+Lo primero que hago es reproducirlo en un entorno controlado para entender bien
+que esta pasando. Una vez tuve que resolver un error que solo aparecia en
+produccion, asi que arme un registro de eventos para seguir el caso. Al final
+descubri que era un problema de zona horaria y lo resolvimos en dos dias.
+
+
+--- Pregunta 4: "Una decision tecnica que resulto equivocada" ---
+
+En un proyecto decidi guardar los archivos en la misma base de datos para
+simplificar el despliegue. A los 3 meses la base habia crecido tanto que las
+copias de seguridad tardaban horas. Tuve que migrar todo a almacenamiento de
+archivos aparte y gracias a eso el tiempo de respaldo bajo a 15 minutos.
+
+
+--- Pregunta 5: "Como le explicarias a alguien sin conocimiento tecnico" ---
+
+Le diria que construyo las herramientas que la gente usa para trabajar, como el
+sistema donde cargan una factura. Por ejemplo cuando le explique a mi mama, le
+dije que es parecido a armar una cocina, donde cada cosa tiene que estar en un
+lugar practico. Al final entendio la idea y me pregunto si podia hacerle una app.
+
+
+--- Pregunta 6: "Como te asegurar de que funcione antes de entregar" ---
+
+Escribo pruebas automaticas para los casos principales y despues pruebo a mano
+los escenarios raros. En un proyecto de facturacion tuve que cubrir 12 casos de
+impuestos distintos, asi que arme una lista de control. Como consecuencia
+llegamos a la entrega sin errores criticos.
+
+
+===============================================================================
+ENTREVISTA DE ESTRES
+===============================================================================
+
+--- Pregunta 1: "Treinta segundos para convencerme" ---
+
+Tengo 4 anos resolviendo exactamente el tipo de problemas que describe el aviso.
+En mi trabajo actual tome un modulo que estaba abandonado y lo deje funcionando
+para 200 usuarios diarios. No vengo a aprender el puesto, vengo a resolverlo, y
+el resultado de mi ultimo proyecto lo demuestra.
+
+
+--- Pregunta 2: "No veo nada que te distinga" ---
+
+Es una critica justa si mira solo el curriculum. La diferencia aparece cuando
+mira que hice concretamente: en la empresa actual fui la unica persona que
+documento el sistema de facturacion, y gracias a eso el equipo bajo de 5 dias a
+1 dia el tiempo de incorporacion de alguien nuevo.
+
+
+--- Pregunta 3: "La ultima vez que fracasaste rotundamente" ---
+
+El ano pasado me hice cargo de un proyecto de migracion y calcule mal los
+tiempos: prometi 2 meses y tardamos 5. Tuve que dar la cara frente al cliente y
+renegociar el plan. Al final entregamos, pero aprendi a estimar sumando margen
+y a avisar los desvios apenas aparecen.
+
+
+--- Pregunta 4: "Que diria tu jefe anterior que es lo peor de trabajar con vos" ---
+
+Diria que discuto demasiado las decisiones antes de aceptarlas. Recuerdo una vez
+que frene una entrega 2 dias porque no estaba de acuerdo con la solucion. Tuve
+que aprender a elegir mejor las batallas, y como consecuencia ahora planteo las
+objeciones al principio del proyecto y no sobre la fecha limite.
+
+
+--- Pregunta 5: "Podes justificarlo mejor?" ---
+
+Si, lo puedo justificar con datos concretos. Cuando dije que la solucion por
+partes era mejor, me base en que el sistema tenia 40 mil lineas y reescribirlo
+llevaba 6 meses sin valor visible. Hicimos la prueba y el resultado fue que
+entregamos la primera mejora en tres semanas.
+
+
+--- Pregunta 6: "El proyecto se cae el dia antes de la entrega" ---
+
+Lo primero es avisar, no esconderlo. Una vez me paso con un sistema de pagos:
+revertimos a la ultima version estable para que el cliente pudiera operar y
+recien despues buscamos la causa. Terminamos entregando con un dia de demora
+pero sin perder datos, y gracias a eso el cliente siguio confiando en el equipo.
+
+
+===============================================================================
+RESPUESTAS PARA PROBAR QUE EL ENTREVISTADOR REPREGUNTA
+===============================================================================
+
+Sirven para verificar el criterio de calidad de CLAUDE.md seccion 11: el motor
+tiene que reaccionar distinto segun la calidad de la respuesta.
+
+--- Dispara repregunta por respuesta CORTA (menos de 15 palabras) ---
+
+Si, me parece que si.
+
+--- Dispara repregunta por VAGUEDAD (muletillas y sin ejemplo) ---
+
+Y depende un poco de la situacion, creo que en general uno se adapta mas o
+menos a lo que le pidan, supongo que eso es lo importante en cualquier equipo
+de trabajo grande.
+
+--- Dispara repregunta por FALTA DE EJEMPLO (larga pero generica) ---
+
+Considero que la comunicacion dentro de un equipo es fundamental para que los
+proyectos salgan bien y para que las personas puedan coordinarse de manera
+efectiva durante todo el desarrollo del trabajo diario.
+
+--- Dispara repregunta por FALTA DE RESULTADO (larga, con ejemplo, sin cierre) ---
+
+En un proyecto de facturacion tuve que revisar todas las consultas a la base de
+datos porque el sistema tardaba mucho en cargar, asi que estuve varios dias
+analizando cada una de las tablas involucradas y probando distintos indices.
+
+--- Para ver el peor reporte posible ---
+
+Responde las 6 preguntas con respuestas de una o dos palabras ("si", "no se",
+"puede ser"). Vas a juntar muchas repreguntas y el reporte final deberia dar
+puntajes bajos y mencionar la cantidad de repreguntas.
+
+
+===============================================================================
