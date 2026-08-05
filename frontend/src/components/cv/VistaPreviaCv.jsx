@@ -45,21 +45,21 @@ function VistaPreviaCv({ cv }) {
   const estilos = {
     ats: {
       raiz: 'font-sans text-[13px] leading-relaxed',
-      nombre: 'text-xl font-bold uppercase tracking-wide',
+      nombre: 'text-xl font-bold uppercase tracking-wide text-neutral-900',
       titular: 'text-sm',
       seccion: 'text-xs font-bold uppercase tracking-wider border-b border-neutral-400 pb-1',
       puesto: 'font-bold',
     },
     moderno: {
       raiz: 'font-sans text-[13px] leading-relaxed',
-      nombre: 'text-2xl font-semibold',
+      nombre: 'text-2xl font-semibold text-neutral-900',
       titular: 'text-sm text-neutral-600',
       seccion: 'text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500',
       puesto: 'font-semibold',
     },
     clasico: {
       raiz: 'font-serif text-[13px] leading-relaxed',
-      nombre: 'text-2xl font-semibold text-center',
+      nombre: 'text-2xl font-semibold text-center text-neutral-900',
       titular: 'text-sm text-center italic',
       seccion: 'text-sm font-semibold border-b border-neutral-300 pb-1',
       puesto: 'font-semibold',

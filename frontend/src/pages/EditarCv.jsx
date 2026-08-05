@@ -126,11 +126,21 @@ function EditarCv() {
             >
               ATS {analisis.puntajeGeneral}/100
             </span>
-            <Boton variante="secundario" onClick={() => window.print()}>
+            <Boton
+              variante="secundario"
+              onClick={() => window.print()}
+              title='Se abre el diálogo de impresión: elegí "Guardar como PDF" como destino'
+            >
               Descargar PDF
             </Boton>
           </div>
         </div>
+
+        <p className="mb-6 text-xs text-texto-tenue">
+          «Descargar PDF» abre el diálogo de impresión de tu navegador: elegí{' '}
+          <strong className="font-medium text-texto-suave">Guardar como PDF</strong> como
+          destino para obtener el archivo.
+        </p>
 
         {/* Pestañas */}
         <div className="mb-6 flex gap-1 border-b border-borde">
