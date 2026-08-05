@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sesiones as apiSesiones, MODO_DEMOSTRACION } from '../api';
+import { sesiones as apiSesiones } from '../api';
 import { useAuth } from '../context/AuthContext';
+import { useModoDemostracion } from '../hooks/useModoDemostracion';
 import Tarjeta from '../components/Tarjeta';
 import Boton from '../components/Boton';
 
@@ -24,6 +25,7 @@ function Dato({ etiqueta, valor }) {
 
 function Perfil() {
   const { usuario, reiniciarDemostracion } = useAuth();
+  const modoDemostracion = useModoDemostracion();
   const navegar = useNavigate();
   const [resumen, setResumen] = useState(null);
   const [reiniciando, setReiniciando] = useState(false);
@@ -71,7 +73,7 @@ function Perfil() {
         />
       </Tarjeta>
 
-      {MODO_DEMOSTRACION && (
+      {modoDemostracion && (
         <Tarjeta>
           <h2 className="mb-1.5 text-lg">Modo demostración</h2>
           <p className="mb-4 text-sm leading-relaxed text-texto-suave">

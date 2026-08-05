@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTema } from '../context/TemaContext';
-import { MODO_DEMOSTRACION } from '../api';
+import { useModoDemostracion } from '../hooks/useModoDemostracion';
 
 const ENLACES = [
   { a: '/', etiqueta: 'Inicio', icono: '◈' },
@@ -14,6 +14,7 @@ const ENLACES = [
 function LayoutApp() {
   const { usuario, cerrarSesion } = useAuth();
   const { tema, alternarTema } = useTema();
+  const modoDemostracion = useModoDemostracion();
   const navegar = useNavigate();
   const [menuAbierto, setMenuAbierto] = useState(false);
 
@@ -71,7 +72,7 @@ function LayoutApp() {
         ))}
       </nav>
 
-      {MODO_DEMOSTRACION && (
+      {modoDemostracion && (
         <div className="mx-3 mb-3 rounded-lg border border-borde bg-superficie-alt px-3 py-2.5">
           <p className="text-xs font-medium text-texto-suave">Modo demostración</p>
           <p className="mt-0.5 text-xs leading-relaxed text-texto-tenue">

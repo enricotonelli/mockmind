@@ -33,27 +33,39 @@ model Usuario {
 }
 
 model Sesion {
-  id             Int                @id @default(autoincrement())
-  usuarioId      Int                @map("id_usuario")
-  usuario        Usuario            @relation(fields: [usuarioId], references: [id])
-  puestoAplicado String             @map("puesto_aplicado")
-  tipoEntrevista TipoEntrevista     @map("tipo_entrevista")
-  fecha          DateTime           @default(now())
-  duracion       Int?
-  puntajeGeneral Float?             @map("puntaje_general")
-  mensajes       Mensaje[]
-  reporte        ReporteEntrevista?
+  id                Int                @id @default(autoincrement())
+  usuarioId         Int                @map("id_usuario")
+  usuario           Usuario            @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  puestoAplicado    String             @map("puesto_aplicado")
+  tipoEntrevista    TipoEntrevista     @map("tipo_entrevista")
+  // Cuántas preguntas tiene esta entrevista (el usuario elige duración al
+  // configurarla: corta/completa/extendida). No es un valor fijo global.
+  cantidadPreguntas Int                @default(6) @map("cantidad_preguntas")
+  // El resto del estado del motor (qué pregunta va, cuántas repreguntas
+  // seguidas lleva) NO se persiste acá: se reconstruye leyendo los mensajes
+  // de la sesión cada vez (ver services/entrevistador.service.js), así no
+  // hay dos fuentes de verdad para lo mismo.
+  finalizada        Boolean            @default(false)
+  fecha             DateTime           @default(now())
+  duracion          Int?
+  puntajeGeneral    Float?             @map("puntaje_general")
+  mensajes          Mensaje[]
+  reporte           ReporteEntrevista?
 
   @@map("sesiones")
 }
 
 model Mensaje {
-  id        Int        @id @default(autoincrement())
-  sesionId  Int        @map("id_sesion")
-  sesion    Sesion     @relation(fields: [sesionId], references: [id])
-  rol       RolMensaje
-  contenido String
-  timestamp DateTime   @default(now())
+  id           Int        @id @default(autoincrement())
+  sesionId     Int        @map("id_sesion")
+  sesion       Sesion     @relation(fields: [sesionId], references: [id], onDelete: Cascade)
+  rol          RolMensaje
+  contenido    String
+  // Si este mensaje del entrevistador fue una repregunta (en vez de la
+  // siguiente pregunta del guion). Es lo que permite reconstruir el estado
+  // del motor sin guardarlo aparte.
+  esRepregunta Boolean    @default(false) @map("es_repregunta")
+  timestamp    DateTime   @default(now())
 
   @@map("mensajes")
 }
@@ -61,7 +73,7 @@ model Mensaje {
 model ReporteEntrevista {
   id                  Int    @id @default(autoincrement())
   sesionId            Int    @unique @map("id_sesion")
-  sesion              Sesion @relation(fields: [sesionId], references: [id])
+  sesion              Sesion @relation(fields: [sesionId], references: [id], onDelete: Cascade)
   puntajeClaridad     Float  @map("puntaje_claridad")
   puntajeStar         Float  @map("puntaje_star")
   puntajeEjemplos     Float  @map("puntaje_ejemplos")
