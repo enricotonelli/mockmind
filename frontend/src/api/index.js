@@ -1,0 +1,13 @@
+// Punto de entrada único de la capa de datos.
+//
+// Las pantallas SIEMPRE importan desde acá, nunca desde ./mock ni desde axios
+// directamente. Cuando el backend esté listo, se implementa la versión real y
+// se cambia la variable VITE_USE_MOCKS a "false": ninguna pantalla se toca.
+
+import * as autenticacionMock from './mock/autenticacion';
+import * as sesionesMock from './mock/sesiones';
+
+export const MODO_DEMOSTRACION = import.meta.env.VITE_USE_MOCKS !== 'false';
+
+export const autenticacion = autenticacionMock;
+export const sesiones = sesionesMock;

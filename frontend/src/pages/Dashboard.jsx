@@ -1,0 +1,168 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { sesiones as apiSesiones } from '../api';
+import { useAuth } from '../context/AuthContext';
+import { TIPOS } from '../components/EtiquetaTipo';
+import Boton from '../components/Boton';
+import Tarjeta from '../components/Tarjeta';
+import TarjetaSesion from '../components/TarjetaSesion';
+import EstadoVacio from '../components/EstadoVacio';
+
+function saludo() {
+  const hora = new Date().getHours();
+  if (hora < 13) return 'Buen día';
+  if (hora < 20) return 'Buenas tardes';
+  return 'Buenas noches';
+}
+
+function Metrica({ etiqueta, valor, detalle, cargando }) {
+  return (
+    <Tarjeta>
+      <p className="mb-1 text-sm text-texto-suave">{etiqueta}</p>
+      {cargando ? (
+        <div className="esqueleto h-8 w-16" />
+      ) : (
+        <p className="font-serif text-3xl font-semibold text-texto">{valor}</p>
+      )}
+      {detalle && !cargando && <p className="mt-1 text-xs text-texto-tenue">{detalle}</p>}
+    </Tarjeta>
+  );
+}
+
+function Dashboard() {
+  const { usuario } = useAuth();
+  const navegar = useNavigate();
+  const [resumen, setResumen] = useState(null);
+  const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+    let vigente = true;
+    apiSesiones
+      .obtenerResumen()
+      .then((datos) => {
+        if (vigente) setResumen(datos);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (vigente) setCargando(false);
+      });
+    return () => {
+      vigente = false;
+    };
+  }, []);
+
+  const primerNombre = (usuario?.nombre ?? '').split(' ')[0];
+  const sinSesiones = !cargando && resumen?.cantidadSesiones === 0;
+
+  return (
+    <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12">
+      <header className="mb-8">
+        <h1 className="mb-1.5 text-3xl font-semibold">
+          {saludo()}, {primerNombre}
+        </h1>
+        <p className="text-[15px] text-texto-suave">
+          {sinSesiones
+            ? 'Empecemos con tu primera entrevista de práctica.'
+            : 'Listo para practicar otra entrevista.'}
+        </p>
+      </header>
+
+      {/* Acción principal */}
+      <Tarjeta className="mb-8 border-acento/25 bg-gradient-to-br from-acento-suave/60 to-transparent">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="mb-1 text-xl">Nueva entrevista</h2>
+            <p className="max-w-md text-sm leading-relaxed text-texto-suave">
+              Cargá la descripción del puesto, elegí el tipo de entrevista y empezá a practicar.
+            </p>
+          </div>
+          <Boton tamano="grande" onClick={() => navegar('/entrevista/nueva')} className="shrink-0">
+            Empezar
+          </Boton>
+        </div>
+      </Tarjeta>
+
+      {/* Métricas */}
+      <div className="mb-8 grid gap-4 sm:grid-cols-3">
+        <Metrica
+          etiqueta="Entrevistas completadas"
+          valor={resumen?.cantidadSesiones ?? 0}
+          cargando={cargando}
+        />
+        <Metrica
+          etiqueta="Puntaje promedio"
+          valor={resumen?.puntajePromedio ?? '—'}
+          detalle={
+            resumen?.evolucion != null
+              ? `${resumen.evolucion >= 0 ? '+' : ''}${resumen.evolucion} desde la primera`
+              : null
+          }
+          cargando={cargando}
+        />
+        <Metrica
+          etiqueta="Tu punto más fuerte"
+          valor={resumen?.mejorDimension ? resumen.mejorDimension.puntaje : '—'}
+          detalle={resumen?.mejorDimension?.nombre}
+          cargando={cargando}
+        />
+      </div>
+
+      {/* Últimas sesiones */}
+      <section>
+        <div className="mb-4 flex items-baseline justify-between">
+          <h2 className="text-xl">Últimas entrevistas</h2>
+          {!sinSesiones && (
+            <button
+              onClick={() => navegar('/historial')}
+              className="text-sm font-medium text-acento hover:underline"
+            >
+              Ver historial
+            </button>
+          )}
+        </div>
+
+        {cargando ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="esqueleto h-[74px]" />
+            ))}
+          </div>
+        ) : sinSesiones ? (
+          <EstadoVacio
+            icono="🎙"
+            titulo="Todavía no hiciste ninguna entrevista"
+            descripcion="Cuando termines la primera, vas a ver acá tu reporte con puntajes y sugerencias de mejora."
+          >
+            <Boton onClick={() => navegar('/entrevista/nueva')}>Hacer mi primera entrevista</Boton>
+          </EstadoVacio>
+        ) : (
+          <div className="space-y-3">
+            {resumen.ultimas.map((sesion) => (
+              <TarjetaSesion key={sesion.id} sesion={sesion} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Tipos de entrevista disponibles */}
+      {!sinSesiones && (
+        <section className="mt-10">
+          <h2 className="mb-4 text-xl">Tipos de entrevista</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {Object.entries(TIPOS).map(([clave, datos]) => (
+              <Tarjeta key={clave} className="p-4">
+                <span className="text-xl" aria-hidden="true">
+                  {datos.icono}
+                </span>
+                <p className="mt-2 text-sm font-medium text-texto">{datos.nombre}</p>
+                <p className="mt-1 text-xs leading-relaxed text-texto-suave">{datos.descripcion}</p>
+              </Tarjeta>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
+
+export default Dashboard;

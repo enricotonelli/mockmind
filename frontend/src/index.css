@@ -1,3 +1,129 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Paleta de MockMind — inspirada en la estética de Claude Desktop.
+   Los colores se definen como variables CSS para que el modo oscuro se resuelva
+   cambiando los valores en un solo lugar, sin duplicar clases en los componentes. */
+@layer base {
+  :root {
+    --fondo: 250 249 245;
+    --fondo-alt: 244 242 236;
+    --superficie: 255 255 255;
+    --superficie-alt: 247 246 241;
+    --borde: 232 228 219;
+    --borde-fuerte: 216 211 199;
+    --texto: 31 30 29;
+    --texto-suave: 107 106 101;
+    --texto-tenue: 154 152 145;
+    --acento: 201 100 66;
+    --acento-suave: 244 226 218;
+    --acento-texto: 255 255 255;
+    --exito: 90 138 100;
+    --alerta: 190 145 62;
+  }
+
+  .oscuro {
+    --fondo: 38 38 36;
+    --fondo-alt: 32 32 30;
+    --superficie: 48 48 46;
+    --superficie-alt: 58 58 55;
+    --borde: 63 63 60;
+    --borde-fuerte: 84 84 80;
+    --texto: 245 244 238;
+    --texto-suave: 168 166 159;
+    --texto-tenue: 128 126 120;
+    --acento: 217 119 87;
+    --acento-suave: 72 51 43;
+    --acento-texto: 26 25 24;
+    --exito: 124 172 133;
+    --alerta: 214 176 100;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-fondo text-texto;
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+      Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  /* Los títulos usan serif, como en Claude Desktop. Fuentes del sistema
+     únicamente: la app tiene que funcionar sin internet. */
+  h1, h2, h3 {
+    font-family: ui-serif, Georgia, Cambria, 'Times New Roman', serif;
+    @apply text-texto;
+  }
+
+  /* Anillo de foco consistente en toda la app (accesibilidad con teclado). */
+  :focus-visible {
+    @apply outline-none ring-2 ring-acento/50 ring-offset-2 ring-offset-fondo;
+  }
+
+  /* Barra de scroll discreta, acorde al resto de la interfaz. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-borde-fuerte;
+  }
+}
+
+@layer components {
+  /* Esqueleto de carga: bloque gris que pulsa mientras llegan los datos. */
+  .esqueleto {
+    @apply animate-pulse rounded-lg bg-superficie-alt;
+  }
+}
+
+@layer utilities {
+  .animar-aparecer {
+    animation: aparecer 0.35s ease-out both;
+  }
+
+  .animar-subir {
+    animation: subir 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes subir {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Puntos de "escribiendo…" del entrevistador en el chat. */
+@keyframes rebotePunto {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.punto-escribiendo {
+  animation: rebotePunto 1.2s infinite;
+}
