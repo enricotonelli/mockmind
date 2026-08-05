@@ -7,6 +7,7 @@ import TarjetaSesion from '../components/TarjetaSesion';
 import Tarjeta from '../components/Tarjeta';
 import EstadoVacio from '../components/EstadoVacio';
 import Boton from '../components/Boton';
+import DialogoConfirmar from '../components/DialogoConfirmar';
 
 const FILTROS = [
   { valor: 'todas', etiqueta: 'Todas' },
@@ -20,6 +21,8 @@ function Historial() {
   const [lista, setLista] = useState([]);
   const [filtro, setFiltro] = useState('todas');
   const [cargando, setCargando] = useState(true);
+  const [porEliminar, setPorEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     let vigente = true;
@@ -41,6 +44,17 @@ function Historial() {
     () => (filtro === 'todas' ? lista : lista.filter((s) => s.tipoEntrevista === filtro)),
     [lista, filtro]
   );
+
+  async function confirmarEliminar() {
+    setEliminando(true);
+    try {
+      await apiSesiones.eliminarSesion(porEliminar.id);
+      setLista((previas) => previas.filter((s) => s.id !== porEliminar.id));
+      setPorEliminar(null);
+    } finally {
+      setEliminando(false);
+    }
+  }
 
   const evolucion = useMemo(() => {
     if (lista.length < 2) return null;
@@ -131,12 +145,26 @@ function Historial() {
           ) : (
             <div className="space-y-3">
               {filtradas.map((sesion) => (
-                <TarjetaSesion key={sesion.id} sesion={sesion} />
+                <TarjetaSesion key={sesion.id} sesion={sesion} onEliminar={setPorEliminar} />
               ))}
             </div>
           )}
         </>
       )}
+
+      <DialogoConfirmar
+        abierto={Boolean(porEliminar)}
+        titulo="¿Eliminar esta entrevista?"
+        descripcion={
+          porEliminar
+            ? `Se van a borrar la conversación y el reporte de "${porEliminar.puestoAplicado}". Esta acción no se puede deshacer y el puntaje va a desaparecer del gráfico de evolución.`
+            : ''
+        }
+        textoConfirmar="Eliminar"
+        procesando={eliminando}
+        onConfirmar={confirmarEliminar}
+        onCancelar={() => setPorEliminar(null)}
+      />
     </div>
   );
 }

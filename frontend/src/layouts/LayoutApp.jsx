@@ -7,6 +7,7 @@ import { MODO_DEMOSTRACION } from '../api';
 const ENLACES = [
   { a: '/', etiqueta: 'Inicio', icono: '◈' },
   { a: '/historial', etiqueta: 'Historial', icono: '◷' },
+  { a: '/cv', etiqueta: 'Mis CVs', icono: '▤' },
   { a: '/perfil', etiqueta: 'Perfil', icono: '◐' },
 ];
 

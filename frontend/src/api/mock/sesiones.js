@@ -24,7 +24,7 @@ function agregarMensaje(datos, sesionId, rol, contenido, esRepregunta = false) {
 }
 
 // Crea la sesión y devuelve la primera pregunta del entrevistador.
-export async function crearSesion({ puestoAplicado, tipoEntrevista }) {
+export async function crearSesion({ puestoAplicado, tipoEntrevista, cantidadPreguntas }) {
   await demorar();
 
   if (!puestoAplicado || puestoAplicado.trim().length < 20) {
@@ -40,6 +40,7 @@ export async function crearSesion({ puestoAplicado, tipoEntrevista }) {
     usuarioId: datos.usuario.id,
     puestoAplicado: puestoAplicado.trim(),
     tipoEntrevista,
+    cantidadPreguntas: cantidadPreguntas || CANTIDAD_PREGUNTAS,
     fecha: new Date().toISOString(),
     duracion: null,
     puntajeGeneral: null,
@@ -54,7 +55,7 @@ export async function crearSesion({ puestoAplicado, tipoEntrevista }) {
   const actualizados = leerDatos();
   actualizados.sesiones.push(sesion);
 
-  const apertura = primeraPregunta(tipoEntrevista, puestoAplicado);
+  const apertura = primeraPregunta(tipoEntrevista, puestoAplicado, sesion.cantidadPreguntas);
   agregarMensaje(actualizados, id, 'entrevistador', apertura.texto);
 
   guardarDatos(actualizados);
@@ -84,10 +85,13 @@ export async function responder({ sesionId, respuesta }) {
   const espera = 700 + Math.min(respuesta.length * 8, 1400);
   await demorar(espera);
 
+  const total = sesion.cantidadPreguntas || CANTIDAD_PREGUNTAS;
+
   const turno = siguienteTurno({
     tipo: sesion.tipoEntrevista,
     puesto: sesion.puestoAplicado,
     respuesta,
+    cantidad: total,
     estado: {
       indicePregunta: sesion.indicePregunta,
       repreguntasSeguidas: sesion.repreguntasSeguidas,
@@ -116,7 +120,7 @@ export async function responder({ sesionId, respuesta }) {
     finalizada: turno.finalizada,
     progreso: {
       actual: turno.indicePregunta + 1,
-      total: Math.min(CANTIDAD_PREGUNTAS, preguntasDe(sesion.tipoEntrevista, sesion.puestoAplicado).length),
+      total: preguntasDe(sesion.tipoEntrevista, sesion.puestoAplicado, total).length,
     },
   };
 }
@@ -180,6 +184,41 @@ export async function listarSesiones() {
   return [...datos.sesiones]
     .filter((s) => s.finalizada)
     .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+}
+
+// Entrevistas empezadas y nunca terminadas, para poder retomarlas.
+export async function listarEnCurso() {
+  await demorar(250);
+  const datos = leerDatos();
+
+  return [...datos.sesiones]
+    .filter((s) => !s.finalizada)
+    .map((sesion) => {
+      const respondidas = datos.mensajes.filter(
+        (m) => m.sesionId === sesion.id && m.rol === 'usuario'
+      ).length;
+      return { ...sesion, respondidas };
+    })
+    .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+}
+
+// Borra una sesión con sus mensajes y su reporte.
+export async function eliminarSesion(sesionId) {
+  await demorar(300);
+
+  const id = Number(sesionId);
+  const datos = leerDatos();
+
+  if (!datos.sesiones.some((s) => s.id === id)) {
+    throw new Error('No se encontró la sesión.');
+  }
+
+  guardarDatos({
+    ...datos,
+    sesiones: datos.sesiones.filter((s) => s.id !== id),
+    mensajes: datos.mensajes.filter((m) => m.sesionId !== id),
+    reportes: datos.reportes.filter((r) => r.sesionId !== id),
+  });
 }
 
 // Métricas para el panel principal.

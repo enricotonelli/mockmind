@@ -163,10 +163,32 @@ function elegirAlAzar(lista) {
 export const CANTIDAD_PREGUNTAS = 6;
 const MAXIMO_REPREGUNTAS_SEGUIDAS = 2;
 
-export function preguntasDe(tipo, puesto) {
+// Duraciones que puede elegir el usuario al configurar la entrevista.
+export const DURACIONES = [
+  {
+    valor: 4,
+    nombre: 'Corta',
+    detalle: '4 preguntas · unos 5 minutos',
+    descripcion: 'Para una práctica rápida o probar cómo funciona.',
+  },
+  {
+    valor: 6,
+    nombre: 'Completa',
+    detalle: '6 preguntas · unos 10 minutos',
+    descripcion: 'La duración recomendada: alcanza para evaluar todas las dimensiones.',
+  },
+  {
+    valor: 8,
+    nombre: 'Extendida',
+    detalle: '8 preguntas · unos 15 minutos',
+    descripcion: 'Se acerca a la duración de una entrevista real.',
+  },
+];
+
+export function preguntasDe(tipo, puesto, cantidad = CANTIDAD_PREGUNTAS) {
   const resumenPuesto = resumirPuesto(puesto);
   return PREGUNTAS[tipo]
-    .slice(0, CANTIDAD_PREGUNTAS)
+    .slice(0, cantidad)
     .map((pregunta) => pregunta.replace('{puesto}', resumenPuesto));
 }
 
@@ -180,8 +202,8 @@ function resumirPuesto(puesto) {
   return palabras.slice(0, 6).join(' ');
 }
 
-export function primeraPregunta(tipo, puesto) {
-  const preguntas = preguntasDe(tipo, puesto);
+export function primeraPregunta(tipo, puesto, cantidad) {
+  const preguntas = preguntasDe(tipo, puesto, cantidad);
   return {
     texto: `Hola, gracias por venir. Vamos a hacer una entrevista ${nombreTipo(tipo)}. ${preguntas[0]}`,
     indicePregunta: 0,
@@ -198,8 +220,8 @@ function nombreTipo(tipo) {
 
 // Decide el siguiente turno del entrevistador a partir de la respuesta del usuario.
 // estado: { indicePregunta, repreguntasSeguidas }
-export function siguienteTurno({ tipo, puesto, respuesta, estado }) {
-  const preguntas = preguntasDe(tipo, puesto);
+export function siguienteTurno({ tipo, puesto, respuesta, estado, cantidad }) {
+  const preguntas = preguntasDe(tipo, puesto, cantidad);
   const analisis = analizarRespuesta(respuesta);
 
   const puedeRepreguntar =

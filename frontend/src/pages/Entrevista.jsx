@@ -37,7 +37,7 @@ function Entrevista() {
         setTerminada(datos.finalizada);
         setProgreso({
           actual: (datos.indicePregunta ?? 0) + 1,
-          total: TOTAL_PREGUNTAS,
+          total: datos.cantidadPreguntas || TOTAL_PREGUNTAS,
         });
       })
       .catch((problema) => {

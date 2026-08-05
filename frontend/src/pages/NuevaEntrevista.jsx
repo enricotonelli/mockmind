@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sesiones as apiSesiones } from '../api';
+import { sesiones as apiSesiones, DURACIONES } from '../api';
 import { TIPOS } from '../components/EtiquetaTipo';
 import Boton from '../components/Boton';
 import Campo from '../components/Campo';
@@ -43,6 +43,7 @@ function NuevaEntrevista() {
   const [paso, setPaso] = useState(1);
   const [puesto, setPuesto] = useState('');
   const [tipo, setTipo] = useState('RRHH');
+  const [cantidadPreguntas, setCantidadPreguntas] = useState(6);
   const [error, setError] = useState('');
   const [creando, setCreando] = useState(false);
 
@@ -56,6 +57,7 @@ function NuevaEntrevista() {
       const sesion = await apiSesiones.crearSesion({
         puestoAplicado: puesto,
         tipoEntrevista: tipo,
+        cantidadPreguntas,
       });
       navegar(`/entrevista/${sesion.id}`);
     } catch (problema) {
@@ -177,6 +179,36 @@ function NuevaEntrevista() {
                 </button>
               );
             })}
+          </div>
+
+          <div className="mt-8">
+            <h2 className="mb-1 text-lg">¿Cuánto querés que dure?</h2>
+            <p className="mb-4 text-sm text-texto-suave">
+              Podés cortar la entrevista antes en cualquier momento y vas a recibir tu reporte igual.
+            </p>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              {DURACIONES.map((opcion) => {
+                const elegida = cantidadPreguntas === opcion.valor;
+                return (
+                  <button
+                    key={opcion.valor}
+                    onClick={() => setCantidadPreguntas(opcion.valor)}
+                    className={`rounded-2xl border p-4 text-left transition ${
+                      elegida
+                        ? 'border-acento bg-acento-suave/40 shadow-suave'
+                        : 'border-borde bg-superficie hover:border-borde-fuerte'
+                    }`}
+                  >
+                    <p className="font-medium text-texto">{opcion.nombre}</p>
+                    <p className="mt-0.5 text-xs text-texto-tenue">{opcion.detalle}</p>
+                    <p className="mt-2 text-xs leading-relaxed text-texto-suave">
+                      {opcion.descripcion}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {error && (

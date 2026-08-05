@@ -33,14 +33,16 @@ function Dashboard() {
   const { usuario } = useAuth();
   const navegar = useNavigate();
   const [resumen, setResumen] = useState(null);
+  const [enCurso, setEnCurso] = useState([]);
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
     let vigente = true;
-    apiSesiones
-      .obtenerResumen()
-      .then((datos) => {
-        if (vigente) setResumen(datos);
+    Promise.all([apiSesiones.obtenerResumen(), apiSesiones.listarEnCurso()])
+      .then(([datos, pendientes]) => {
+        if (!vigente) return;
+        setResumen(datos);
+        setEnCurso(pendientes);
       })
       .catch(() => {})
       .finally(() => {
@@ -66,6 +68,40 @@ function Dashboard() {
             : 'Listo para practicar otra entrevista.'}
         </p>
       </header>
+
+      {/* Entrevistas empezadas y no terminadas */}
+      {enCurso.length > 0 && (
+        <section className="mb-8">
+          {enCurso.map((sesion) => (
+            <Tarjeta key={sesion.id} className="mb-3 border-alerta/40 bg-alerta/5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p className="mb-0.5 text-sm font-medium text-texto">
+                    Tenés una entrevista sin terminar
+                  </p>
+                  <p className="truncate text-sm text-texto-suave">
+                    {sesion.puestoAplicado}
+                  </p>
+                  <p className="mt-0.5 text-xs text-texto-tenue">
+                    {sesion.respondidas === 0
+                      ? 'Todavía no respondiste ninguna pregunta'
+                      : `Respondiste ${sesion.respondidas} ${
+                          sesion.respondidas === 1 ? 'pregunta' : 'preguntas'
+                        }`}
+                  </p>
+                </div>
+                <Boton
+                  variante="secundario"
+                  onClick={() => navegar(`/entrevista/${sesion.id}`)}
+                  className="shrink-0"
+                >
+                  Retomar
+                </Boton>
+              </div>
+            </Tarjeta>
+          ))}
+        </section>
+      )}
 
       {/* Acción principal */}
       <Tarjeta className="mb-8 border-acento/25 bg-gradient-to-br from-acento-suave/60 to-transparent">

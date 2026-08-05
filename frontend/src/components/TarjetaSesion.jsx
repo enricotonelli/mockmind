@@ -21,31 +21,47 @@ function colorPuntaje(puntaje) {
   return 'text-acento';
 }
 
-function TarjetaSesion({ sesion }) {
+// La tarjeta no puede ser un <button> porque adentro lleva el botón de borrar
+// (no se puede anidar un botón dentro de otro). Se usa un div con la zona
+// principal clickeable.
+function TarjetaSesion({ sesion, onEliminar }) {
   const navegar = useNavigate();
   const duracion = formatearDuracion(sesion.duracion);
 
   return (
-    <button
-      onClick={() => navegar(`/reporte/${sesion.id}`)}
-      className="flex w-full items-center gap-4 rounded-2xl border border-borde bg-superficie p-4 text-left transition hover:border-borde-fuerte hover:shadow-suave"
-    >
-      <div className="min-w-0 flex-1">
-        <div className="mb-1 flex flex-wrap items-center gap-2">
-          <EtiquetaTipo tipo={sesion.tipoEntrevista} />
-          <span className="text-xs text-texto-tenue">{formatearFecha(sesion.fecha)}</span>
-          {duracion && <span className="text-xs text-texto-tenue">· {duracion}</span>}
+    <div className="flex items-center gap-2 rounded-2xl border border-borde bg-superficie pr-3 transition hover:border-borde-fuerte hover:shadow-suave">
+      <button
+        onClick={() => navegar(`/reporte/${sesion.id}`)}
+        className="flex min-w-0 flex-1 items-center gap-4 p-4 text-left"
+      >
+        <div className="min-w-0 flex-1">
+          <div className="mb-1 flex flex-wrap items-center gap-2">
+            <EtiquetaTipo tipo={sesion.tipoEntrevista} />
+            <span className="text-xs text-texto-tenue">{formatearFecha(sesion.fecha)}</span>
+            {duracion && <span className="text-xs text-texto-tenue">· {duracion}</span>}
+          </div>
+          <p className="truncate text-sm font-medium text-texto">{sesion.puestoAplicado}</p>
         </div>
-        <p className="truncate text-sm font-medium text-texto">{sesion.puestoAplicado}</p>
-      </div>
 
-      <div className="shrink-0 text-right">
-        <p className={`font-serif text-2xl font-semibold ${colorPuntaje(sesion.puntajeGeneral)}`}>
-          {sesion.puntajeGeneral}
-        </p>
-        <p className="text-xs text-texto-tenue">puntos</p>
-      </div>
-    </button>
+        <div className="shrink-0 text-right">
+          <p className={`font-serif text-2xl font-semibold ${colorPuntaje(sesion.puntajeGeneral)}`}>
+            {sesion.puntajeGeneral}
+          </p>
+          <p className="text-xs text-texto-tenue">puntos</p>
+        </div>
+      </button>
+
+      {onEliminar && (
+        <button
+          onClick={() => onEliminar(sesion)}
+          title="Eliminar esta entrevista"
+          aria-label={`Eliminar la entrevista de ${sesion.puestoAplicado}`}
+          className="shrink-0 rounded-lg p-2 text-texto-tenue transition hover:bg-superficie-alt hover:text-acento"
+        >
+          ✕
+        </button>
+      )}
+    </div>
   );
 }
 

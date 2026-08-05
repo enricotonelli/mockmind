@@ -10,6 +10,9 @@ import Entrevista from './pages/Entrevista';
 import Reporte from './pages/Reporte';
 import Historial from './pages/Historial';
 import Perfil from './pages/Perfil';
+import MisCvs from './pages/MisCvs';
+import NuevoCv from './pages/NuevoCv';
+import EditarCv from './pages/EditarCv';
 
 // Deja pasar solo si hay una sesión activa.
 function RutaProtegida({ children }) {
@@ -67,6 +70,9 @@ function Rutas() {
         <Route path="/entrevista/:id" element={<Entrevista />} />
         <Route path="/reporte/:id" element={<Reporte />} />
         <Route path="/historial" element={<Historial />} />
+        <Route path="/cv" element={<MisCvs />} />
+        <Route path="/cv/nuevo" element={<NuevoCv />} />
+        <Route path="/cv/:id" element={<EditarCv />} />
         <Route path="/perfil" element={<Perfil />} />
       </Route>
 
