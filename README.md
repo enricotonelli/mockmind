@@ -27,8 +27,16 @@ Completá `backend/.env` con las **3 credenciales obligatorias** — es el
 un valor por defecto que funciona:
 
 1. **`DATABASE_URL`** — la base PostgreSQL. Lo más simple es crear un
-   proyecto gratis en [Supabase](https://supabase.com) y copiar el
-   `Connection string` → `URI`. También sirve un Postgres local.
+   proyecto gratis en [Supabase](https://supabase.com) y copiar la cadena de
+   conexión — usar la del **Connection Pooling → Transaction** (puerto
+   `6543`), no la de "Direct connection" (puerto `5432`): esa última usa
+   IPv6 y muchas redes no la alcanzan.
+
+   > **Si desarrollás detrás de una red corporativa o restringida** y ni
+   > siquiera el puerto `6543` conecta (pasa en redes que solo dejan salir
+   > tráfico por 80/443), usá Postgres local en su lugar — ver
+   > [sección de más abajo](#desarrollo-local-con-postgres-en-vez-de-supabase).
+   > Es exactamente lo que se hizo en el desarrollo de este proyecto.
 2. **`ANTHROPIC_API_KEY`** — se genera en
    [console.anthropic.com](https://console.anthropic.com) (cuenta distinta a
    la suscripción de Claude/Claude Code). Es la que hace funcionar al
@@ -45,6 +53,32 @@ npm run dev
 
 Corre en `http://localhost:3000`. `GET /api/health` responde `{ "ok": true }`
 si el servidor está arriba (no hace falta la base para eso).
+
+#### Desarrollo local con Postgres (en vez de Supabase)
+
+Si tu red bloquea los puertos de base de datos hacia afuera (pasó en el
+desarrollo de este proyecto: una red corporativa dejaba pasar solo 80/443),
+usá un Postgres local — corre en `localhost`, nunca sale a internet, así que
+ningún firewall lo toca. Esto es **solo para desarrollar en esa máquina**:
+cuando se despliegue el backend en Railway/Render, ahí sí se usa la
+`DATABASE_URL` de Supabase, porque esos servidores no tienen esa restricción.
+
+```bash
+brew install postgresql@16
+brew services start postgresql@16
+createdb mockmind
+```
+
+Y en `backend/.env`:
+
+```
+DATABASE_URL="postgresql://TU_USUARIO_DE_MAC@localhost:5432/mockmind"
+```
+
+(`TU_USUARIO_DE_MAC` es lo que devuelve `whoami` en la terminal — Postgres de
+Homebrew usa el usuario del sistema como superusuario local, sin contraseña).
+Guardá la cadena de Supabase comentada al lado, para no perderla cuando
+llegue el momento de desplegar.
 
 ### 2. Frontend
 
