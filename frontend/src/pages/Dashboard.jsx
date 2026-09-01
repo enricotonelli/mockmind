@@ -54,7 +54,9 @@ function Dashboard() {
   }, []);
 
   const primerNombre = (usuario?.nombre ?? '').split(' ')[0];
-  const sinSesiones = !cargando && resumen?.cantidadSesiones === 0;
+  // Si el pedido de resumen falló (ej: sesión inválida), resumen queda en
+  // null: se trata igual que "sin sesiones" en vez de romper el render.
+  const sinSesiones = !cargando && (!resumen || resumen.cantidadSesiones === 0);
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12">
