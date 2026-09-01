@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { leerSesion, borrarSesion } from './real/sesionLocal';
-import { cerrarSesion as cerrarSesionMock } from './mock/autenticacion';
+import { leerDatos as leerDatosMock, guardarDatos as guardarDatosMock } from './mock/almacenamiento';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
@@ -35,7 +35,13 @@ apiClient.interceptors.response.use(
 
     if (error.response?.status === 401 && !esRutaPublica) {
       borrarSesion();
-      cerrarSesionMock().catch(() => {});
+      // Limpieza directa y sincrónica: la función "cerrarSesion" del mock
+      // tiene un demorar() artificial (para que se sienta como una llamada
+      // de red en la demo), y acá no podemos esperarlo — si no terminaba
+      // antes del redirect de abajo, el usuario mock nunca se borraba de
+      // verdad y esto entraba en loop infinito de recarga.
+      guardarDatosMock({ ...leerDatosMock(), usuario: null });
+
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
         window.location.href = '/login';
       }
