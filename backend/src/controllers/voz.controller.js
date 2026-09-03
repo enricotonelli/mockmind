@@ -1,10 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const OpenAI = require('openai');
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const { transcribeAudio, generateSpeech } = require('ai');
+const { openai } = require('@ai-sdk/openai');
 
 // POST /api/voz/transcribir
 // Body: multipart/form-data con campo "audio" (archivo WAV/MP3/M4A)
@@ -17,17 +14,20 @@ async function transcribir(req, res) {
 
     const archivoTemporal = req.file.path;
 
-    // Usar Whisper para transcribir
-    const transcripcion = await openai.audio.transcriptions.create({
-      file: fs.createReadStream(archivoTemporal),
-      model: 'whisper-1',
-      language: 'es', // Español por defecto
+    // Leer el archivo de audio
+    const audioBuffer = fs.readFileSync(archivoTemporal);
+
+    // Usar AI SDK para transcribir (Whisper de OpenAI)
+    const resultado = await transcribeAudio({
+      model: openai.audio.transcription('whisper-1'),
+      audio: audioBuffer,
+      language: 'es',
     });
 
     // Limpiar archivo temporal
     fs.unlinkSync(archivoTemporal);
 
-    res.json({ texto: transcripcion.text });
+    res.json({ texto: resultado.text });
   } catch (error) {
     console.error('Error en transcribir:', error.message);
     if (req.file) {
@@ -52,19 +52,19 @@ async function hablar(req, res) {
       return res.status(400).json({ error: 'No se proporcionó texto' });
     }
 
-    // Usar TTS para generar voz
-    const audio = await openai.audio.speech.create({
-      model: 'tts-1', // Modelo más rápido y barato
-      voice: 'nova', // Voz natural
-      input: texto,
+    // Usar AI SDK para generar voz (TTS de OpenAI)
+    const audio = await generateSpeech({
+      model: openai.audio.speech('tts-1'),
+      text: texto,
+      voice: 'nova',
     });
 
-    // Convertir el buffer a stream y enviarlo
-    const buffer = await audio.arrayBuffer();
+    // El audio es un ArrayBuffer, convertirlo a Buffer para enviar
+    const buffer = Buffer.from(audio);
 
     res.setHeader('Content-Type', 'audio/mpeg');
     res.setHeader('Content-Disposition', 'attachment; filename="audio.mp3"');
-    res.send(Buffer.from(buffer));
+    res.send(buffer);
   } catch (error) {
     console.error('Error en hablar:', error.message);
     res.status(500).json({ error: error.message });
