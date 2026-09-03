@@ -41,7 +41,7 @@ export async function finalizarSesion(sesionId) {
 
 export async function obtenerReporte(sesionId) {
   const { data } = await apiClient.get(`/sesiones/${sesionId}/reporte`);
-  return data.reporte;
+  return { reporte: data.reporte, sesion: data.sesion };
 }
 
 export async function listarSesiones() {

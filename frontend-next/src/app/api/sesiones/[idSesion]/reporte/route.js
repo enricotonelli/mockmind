@@ -25,7 +25,7 @@ export async function GET(request, { params }) {
       return respuestaError('Todavía no se generó el reporte de esta sesión', 404);
     }
 
-    return respuestaOk({ reporte });
+    return respuestaOk({ reporte, sesion });
   } catch (error) {
     console.error('Error al obtener reporte:', error);
     return respuestaError(error.message || 'Error al obtener reporte', 500);
