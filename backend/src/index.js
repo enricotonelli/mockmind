@@ -5,6 +5,7 @@ const cors = require('cors');
 
 const authRoutes = require('./routes/auth.routes');
 const sesionesRoutes = require('./routes/sesiones.routes');
+const vozRoutes = require('./routes/voz.routes');
 const { manejoErrores } = require('./middleware/manejoErrores');
 
 const app = express();
@@ -21,6 +22,7 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/sesiones', sesionesRoutes);
+app.use('/api/voz', vozRoutes);
 
 // 404 para cualquier ruta de API no definida.
 app.use('/api', (req, res) => {

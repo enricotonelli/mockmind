@@ -14,8 +14,10 @@
 import * as autenticacionMock from './mock/autenticacion';
 import * as sesionesMock from './mock/sesiones';
 import * as cvMock from './mock/cv';
+import * as vozMock from './mock/voz';
 import * as autenticacionReal from './real/autenticacion';
 import * as sesionesReal from './real/sesiones';
+import * as vozReal from './real/voz';
 import { borrarSesion as borrarSesionReal } from './real/sesionLocal';
 
 const FORZAR_MOCK = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
@@ -106,6 +108,10 @@ export const autenticacion = FORZAR_MOCK
 export const sesiones = FORZAR_MOCK
   ? sesionesMock
   : envolverConRespaldo('sesiones', sesionesReal, sesionesMock);
+
+export const voz = FORZAR_MOCK
+  ? vozMock
+  : envolverConRespaldo('voz', vozReal, vozMock);
 
 // El Módulo 3 (creador de CV) todavía no tiene backend: CLAUDE.md §3 dice
 // explícitamente no construirlo hasta que el Módulo 1 funcione de punta a
