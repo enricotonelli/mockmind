@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { client } from '../client';
+import client from '../client';
 
 // POST /api/voz/transcribir
 // Envía un archivo de audio y recibe la transcripción en texto
