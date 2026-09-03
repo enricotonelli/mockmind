@@ -51,22 +51,27 @@ Crear un archivo `.env.production.local` en `frontend-next/` con:
 # Base de datos (desde Supabase)
 DATABASE_URL="postgresql://..."
 
-# Autenticación
-JWT_SECRET="cambiar-a-una-clave-larga-y-aleatoria-en-produccion"
+# JWT (generar una cadena larga aleatoria)
+JWT_SECRET="generar-con-crypto-random-en-produccion"
 
-# APIs de IA (desde console.anthropic.com y platform.openai.com)
+# AI SDK - Claude Haiku (Anthropic)
+# Obtener en https://console.anthropic.com
+# Usado para: entrevistador, análisis de respuestas
 ANTHROPIC_API_KEY="sk-ant-..."
+
+# AI SDK - OpenAI
+# Obtener en https://platform.openai.com
+# Usado para: Whisper (STT), TTS (Speech)
 OPENAI_API_KEY="sk-..."
 
-# Modelo a usar
+# Modelo de IA (Haiku: más barato y suficiente para entrevistas)
 CLAUDE_INTERVIEW_MODEL="claude-haiku-4-5-20251001"
 ```
 
-**⚠️ IMPORTANTE:** No commitear este archivo. Agregar a `.gitignore`:
-```
-.env*.local
-.env.production.local
-```
+**⚠️ IMPORTANTE:** 
+- No commitear este archivo. Ya está en `.gitignore`
+- Las API keys se usan **vía AI SDK** (https://ai-sdk.dev/), no llamadas HTTP directas
+- Vercel manejará estas variables automáticamente como "Environment Variables"
 
 ## Paso 3: Pushear a GitHub
 

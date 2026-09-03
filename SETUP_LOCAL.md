@@ -57,16 +57,22 @@ NEXT_PUBLIC_API_URL=http://localhost:3000/api
 # Base de datos
 DATABASE_URL="postgresql://postgres:password@localhost:5432/mockmind_dev"
 
-# JWT
+# JWT (cambiar en producción)
 JWT_SECRET="secreto-desarrollo-cambiar-en-prod"
 
-# APIs (obtener en console.anthropic.com y platform.openai.com)
+# AI SDK - Claude Haiku (obtener en console.anthropic.com)
+# Usado por ai-sdk.dev para: entrevistador, análisis de respuestas
 ANTHROPIC_API_KEY="sk-ant-..."
+
+# AI SDK - OpenAI (obtener en platform.openai.com)
+# Usado por ai-sdk.dev para: Whisper (STT), TTS (Speech)
 OPENAI_API_KEY="sk-..."
 
-# Modelo
+# Modelo de IA (Haiku: 5-6x más barato que Sonnet)
 CLAUDE_INTERVIEW_MODEL="claude-haiku-4-5-20251001"
 ```
+
+**Nota importante:** Las API keys se usan **a través de AI SDK** (https://ai-sdk.dev/), no directamente. El código nunca hace llamadas HTTP directas a Anthropic/OpenAI; todo pasa por el AI SDK.
 
 ## Paso 4: Crear tablas (primera vez)
 

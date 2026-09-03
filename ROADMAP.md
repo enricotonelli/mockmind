@@ -162,10 +162,15 @@ Escalable sin costo fijo. Solo pagas por uso.
 - PostgreSQL: escalable, free tier en Supabase
 - Connection pooling en dev/prod
 
-### IA
-- Claude Haiku: 80% más barato que Sonnet, suficiente para entrevistas
-- OpenAI Whisper: ~$0.02 por minuto de audio
-- OpenAI TTS: ~$0.015 por 1K caracteres
+### IA (vía AI SDK)
+- **Claude Haiku** (via AI SDK): 5-6x más barato que Sonnet, suficiente para entrevistas
+  - Reasoning: entrevistador, análisis de respuestas
+  - ~$0.80 entrada, ~$4 salida por millón de tokens
+- **OpenAI Whisper** (via AI SDK): STT (speech-to-text)
+  - ~$0.02 por minuto de audio
+- **OpenAI TTS** (via AI SDK): TTS (text-to-speech)
+  - ~$0.015 por 1K caracteres
+- **Nota:** TODO pasa por https://ai-sdk.dev/, no llamadas HTTP directas
 
 ## 🔗 Enlaces útiles
 
