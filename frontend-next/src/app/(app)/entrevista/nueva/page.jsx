@@ -1,9 +1,11 @@
+'use client';
+
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { sesiones as apiSesiones, DURACIONES } from '../api';
-import { TIPOS } from '../components/EtiquetaTipo';
-import Boton from '../components/Boton';
-import Campo from '../components/Campo';
+import { useRouter } from 'next/navigation';
+import { sesiones as apiSesiones, DURACIONES } from '../../../../api';
+import { TIPOS } from '../../../../components/EtiquetaTipo';
+import Boton from '../../../../components/Boton';
+import Campo from '../../../../components/Campo';
 
 // Descripciones listas para usar, así se puede probar la app sin tener que
 // escribir un aviso completo a mano.
@@ -38,7 +40,7 @@ const EJEMPLOS = [
 const MINIMO_CARACTERES = 20;
 
 function NuevaEntrevista() {
-  const navegar = useNavigate();
+  const router = useRouter();
 
   const [paso, setPaso] = useState(1);
   const [puesto, setPuesto] = useState('');
@@ -59,7 +61,7 @@ function NuevaEntrevista() {
         tipoEntrevista: tipo,
         cantidadPreguntas,
       });
-      navegar(`/entrevista/${sesion.id}`);
+      router.push(`/entrevista/${sesion.id}`);
     } catch (problema) {
       setError(problema.message);
       setCreando(false);
@@ -216,7 +218,7 @@ function NuevaEntrevista() {
 
           <div className="mt-8 flex items-center justify-between gap-3">
             <Boton variante="fantasma" onClick={() => setPaso(1)} disabled={creando}>
-              ← Volver
+              Volver
             </Boton>
             <Boton tamano="grande" onClick={comenzar} cargando={creando}>
               {creando ? 'Preparando la entrevista…' : 'Comenzar entrevista'}

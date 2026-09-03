@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+/* Tailwind v4 define el theme en CSS, no en un archivo de config JS: cada
+   --color-x de acá abajo genera las utilidades bg-x/text-x/border-x, etc.
+   Ya no hace falta el truco de <alpha-value> de v3 — los modificadores de
+   opacidad (bg-acento/20) funcionan solos sobre cualquier color válido. */
+@theme {
+  --color-fondo: rgb(var(--fondo));
+  --color-fondo-alt: rgb(var(--fondo-alt));
+  --color-superficie: rgb(var(--superficie));
+  --color-superficie-alt: rgb(var(--superficie-alt));
+  --color-borde: rgb(var(--borde));
+  --color-borde-fuerte: rgb(var(--borde-fuerte));
+  --color-texto: rgb(var(--texto));
+  --color-texto-suave: rgb(var(--texto-suave));
+  --color-texto-tenue: rgb(var(--texto-tenue));
+  --color-acento: rgb(var(--acento));
+  --color-acento-suave: rgb(var(--acento-suave));
+  --color-acento-texto: rgb(var(--acento-texto));
+  --color-exito: rgb(var(--exito));
+  --color-alerta: rgb(var(--alerta));
+
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+
+  --shadow-suave: 0 1px 2px rgb(0 0 0 / 0.04), 0 2px 8px rgb(0 0 0 / 0.04);
+  --shadow-elevada: 0 2px 4px rgb(0 0 0 / 0.05), 0 8px 24px rgb(0 0 0 / 0.08);
+
+  --default-transition-duration: 150ms;
+}
+
+/* Paleta de MockMind — inspirada en la estética de Claude Desktop.
+   Los colores se definen como variables CSS para que el modo oscuro se resuelva
+   cambiando los valores en un solo lugar, sin duplicar clases en los componentes. */
+@layer base {
+  :root {
+    --fondo: 250 249 245;
+    --fondo-alt: 244 242 236;
+    --superficie: 255 255 255;
+    --superficie-alt: 247 246 241;
+    --borde: 232 228 219;
+    --borde-fuerte: 216 211 199;
+    --texto: 31 30 29;
+    --texto-suave: 107 106 101;
+    --texto-tenue: 154 152 145;
+    --acento: 12 35 64;
+    --acento-suave: 219 228 240;
+    --acento-texto: 255 255 255;
+    --exito: 90 138 100;
+    --alerta: 190 145 62;
+  }
+
+  .oscuro {
+    --fondo: 38 38 36;
+    --fondo-alt: 32 32 30;
+    --superficie: 48 48 46;
+    --superficie-alt: 58 58 55;
+    --borde: 63 63 60;
+    --borde-fuerte: 84 84 80;
+    --texto: 245 244 238;
+    --texto-suave: 168 166 159;
+    --texto-tenue: 128 126 120;
+    /* En modo oscuro el azul #0C2340 queda casi invisible sobre el fondo, así
+       que los textos y las etiquetas usan una versión aclarada de la misma
+       familia. Los rellenos sólidos siguen siendo el azul de marca. */
+    --acento: 125 164 209;
+    --acento-suave: 28 45 68;
+    --acento-texto: 12 35 64;
+    --exito: 124 172 133;
+    --alerta: 214 176 100;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-fondo text-texto;
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  /* Los títulos usan serif, como en Claude Desktop. Fuentes del sistema
+     únicamente: la app tiene que funcionar sin internet. */
+  h1, h2, h3 {
+    font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+    @apply text-texto;
+  }
+
+  /* Anillo de foco consistente en toda la app (accesibilidad con teclado). */
+  :focus-visible {
+    @apply outline-none ring-2 ring-acento/50 ring-offset-2 ring-offset-fondo;
+  }
+
+  /* Barra de scroll discreta, acorde al resto de la interfaz. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-borde-fuerte;
+  }
+}
+
+@layer components {
+  /* Esqueleto de carga: bloque gris que pulsa mientras llegan los datos. */
+  .esqueleto {
+    @apply animate-pulse rounded-lg bg-superficie-alt;
+  }
+}
+
+@layer utilities {
+  .animar-aparecer {
+    animation: aparecer 0.35s ease-out both;
+  }
+
+  .animar-subir {
+    animation: subir 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes subir {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Puntos de "escribiendo…" del entrevistador en el chat. */
+@keyframes rebotePunto {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.punto-escribiendo {
+  animation: rebotePunto 1.2s infinite;
+}
+
+/* Impresión: al usar "Descargar PDF" en el editor de CV, se imprime solo la
+   hoja del currículum, sin la interfaz de la aplicación alrededor. */
+@media print {
+  .no-imprimir,
+  aside,
+  header.lg\:hidden {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .zona-impresion {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  @page {
+    margin: 12mm;
+  }
+}

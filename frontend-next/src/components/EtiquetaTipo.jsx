@@ -1,3 +1,5 @@
+'use client';
+
 // Etiqueta de color según el tipo de entrevista, usada en historial y reportes.
 
 export const TIPOS = {

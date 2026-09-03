@@ -1,12 +1,14 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { sesiones as apiSesiones } from '../api';
-import { useAuth } from '../context/AuthContext';
-import { TIPOS } from '../components/EtiquetaTipo';
-import Boton from '../components/Boton';
-import Tarjeta from '../components/Tarjeta';
-import TarjetaSesion from '../components/TarjetaSesion';
-import EstadoVacio from '../components/EstadoVacio';
+import { useRouter } from 'next/navigation';
+import { sesiones as apiSesiones } from '../../api';
+import { useAuth } from '../../context/AuthContext';
+import { TIPOS } from '../../components/EtiquetaTipo';
+import Boton from '../../components/Boton';
+import Tarjeta from '../../components/Tarjeta';
+import TarjetaSesion from '../../components/TarjetaSesion';
+import EstadoVacio from '../../components/EstadoVacio';
 
 function saludo() {
   const hora = new Date().getHours();
@@ -31,7 +33,7 @@ function Metrica({ etiqueta, valor, detalle, cargando }) {
 
 function Dashboard() {
   const { usuario } = useAuth();
-  const navegar = useNavigate();
+  const router = useRouter();
   const [resumen, setResumen] = useState(null);
   const [enCurso, setEnCurso] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -94,7 +96,7 @@ function Dashboard() {
                 </div>
                 <Boton
                   variante="secundario"
-                  onClick={() => navegar(`/entrevista/${sesion.id}`)}
+                  onClick={() => router.push(`/entrevista/${sesion.id}`)}
                   className="shrink-0"
                 >
                   Retomar
@@ -114,7 +116,7 @@ function Dashboard() {
               Cargá la descripción del puesto, elegí el tipo de entrevista y empezá a practicar.
             </p>
           </div>
-          <Boton tamano="grande" onClick={() => navegar('/entrevista/nueva')} className="shrink-0">
+          <Boton tamano="grande" onClick={() => router.push('/entrevista/nueva')} className="shrink-0">
             Empezar
           </Boton>
         </div>
@@ -151,7 +153,7 @@ function Dashboard() {
           <h2 className="text-xl">Últimas entrevistas</h2>
           {!sinSesiones && (
             <button
-              onClick={() => navegar('/historial')}
+              onClick={() => router.push('/historial')}
               className="text-sm font-medium text-acento hover:underline"
             >
               Ver historial
@@ -167,11 +169,10 @@ function Dashboard() {
           </div>
         ) : sinSesiones ? (
           <EstadoVacio
-            icono="🎙"
             titulo="Todavía no hiciste ninguna entrevista"
             descripcion="Cuando termines la primera, vas a ver acá tu reporte con puntajes y sugerencias de mejora."
           >
-            <Boton onClick={() => navegar('/entrevista/nueva')}>Hacer mi primera entrevista</Boton>
+            <Boton onClick={() => router.push('/entrevista/nueva')}>Hacer mi primera entrevista</Boton>
           </EstadoVacio>
         ) : (
           <div className="space-y-3">
