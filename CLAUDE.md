@@ -22,7 +22,9 @@
 
 MockMind es una plataforma web que permite a cualquier persona simular
 entrevistas laborales reales de forma autónoma, con un entrevistador virtual
-conversacional impulsado por IA (Claude Sonnet API).
+conversacional impulsado por IA (Claude Haiku API). Soporta respuestas por texto
+o voz: el usuario puede escribir, grabar audio (que se transcribe automáticamente),
+o escuchar las preguntas en audio generado por TTS.
 
 **El problema que resuelve:** la mayoría de la gente llega a sus entrevistas sin
 haber practicado nunca en un entorno real. Leen guías, miran videos, pero nunca
@@ -56,19 +58,21 @@ en la calidad de las respuestas a lo largo de las sesiones.
 
 ## 3. Alcance
 
-### MVP — Módulo 1: Motor de entrevistas (construir PRIMERO, todo esto)
+### MVP — Módulo 1: Motor de entrevistas (COMPLETO)
 
-- Registro e inicio de sesión con autenticación segura (JWT + bcrypt)
-- Perfil de usuario
-- Configuración de sesión: carga de descripción del puesto + selección del tipo
+- ✅ Registro e inicio de sesión con autenticación segura (JWT + bcrypt)
+- ✅ Perfil de usuario
+- ✅ Configuración de sesión: carga de descripción del puesto + selección del tipo
   de entrevista (RRHH / Técnica / Estrés)
-- Motor de entrevista por chat con integración a Claude API
-- Análisis de respuestas por turno: detección de vaguedad, ausencia de ejemplos
+- ✅ Motor de entrevista por chat con integración a Claude Haiku API
+- ✅ Modo de voz: grabación de respuestas (STT con Whisper), generación de audio
+  para preguntas (TTS con OpenAI), transcripción automática
+- ✅ Análisis de respuestas por turno: detección de vaguedad, ausencia de ejemplos
   concretos, evaluación del método STAR
-- Generación de reporte de feedback estructurado con puntajes por dimensión y
+- ✅ Generación de reporte de feedback estructurado con puntajes por dimensión y
   sugerencias de mejora
-- Historial de sesiones con visualización de evolución del desempeño
-- Pruebas con 2-3 usuarios reales al finalizar el desarrollo
+- ✅ Historial de sesiones con visualización de evolución del desempeño
+- Frontend migrado a Next.js 15 + React 19 + Tailwind v4 (App Router)
 
 ### Segunda fase (NO arrancar hasta tener el Módulo 1 funcionando)
 
@@ -81,11 +85,10 @@ en la calidad de las respuestas a lo largo de las sesiones.
 
 ### Explícitamente FUERA de alcance (trabajo futuro, no implementar)
 
-- Modo de entrevista por voz (STT/TTS con Whisper/ElevenLabs)
 - Detección de contradicciones entre turnos distantes (el análisis es por turno)
 - Entrenamiento o desarrollo de modelos de lenguaje propios
 - Conexión con ofertas laborales reales o reclutadores
-- Análisis de lenguaje corporal o tono de voz
+- Análisis de lenguaje corporal o tono de voz (solo transcripción de audio)
 
 Estas exclusiones son decisiones deliberadas para garantizar que lo que se
 entrega funcione bien dentro del tiempo disponible. Cualquier desvío del alcance
@@ -103,13 +106,15 @@ se trata como trabajo futuro, no como ajuste al plan.
 
 | Capa | Tecnología |
 |---|---|
-| Frontend | React + Vite + Tailwind CSS + Axios |
-| Backend | Node.js + Express |
+| Frontend | Next.js 15 + React 19 + Tailwind CSS v4 + Axios |
+| Backend | Node.js + Express + Vercel AI SDK |
 | Base de datos | PostgreSQL + Prisma ORM |
 | Autenticación | JWT + bcrypt |
-| IA conversacional | Claude Sonnet API (Anthropic) — principal |
-| IA alternativa | GPT-4o (OpenAI) — solo respaldo/comparación en prefactibilidad |
-| Deploy frontend | Vercel |
+| IA motor de entrevistas | Claude Haiku 4.5 (Anthropic) — optimizado por costo |
+| STT (voz a texto) | Whisper (OpenAI) |
+| TTS (texto a voz) | OpenAI Text-to-Speech |
+| Generación de objetos | Vercel AI SDK + Zod |
+| Deploy frontend | Vercel (Next.js nativo) |
 | Deploy backend | Railway o Render |
 | DB en la nube | Supabase |
 | Versionado | Git + GitHub |
@@ -289,15 +294,30 @@ pedir ni almacenar credenciales.
 
 ---
 
-## 13. Sobre la API de Claude
+## 13. Sobre las APIs de IA
+
+### Anthropic (Claude Haiku para entrevistas)
 
 - Se necesita una API key de Anthropic (distinta de la suscripción de Claude
   Code), obtenida en console.anthropic.com.
+- Modelo: **Claude Haiku 4.5** (no Sonnet) — elegido para **minimizar costos** sin
+  sacrificar calidad. Haiku es tan capaz como Sonnet para tareas estructuradas
+  (generar reporte, decidir si repreguntar), pero 5-6x más barato.
 - La key se guarda en `backend/.env` como variable de entorno, nunca en código.
-- Modelo principal: Claude Sonnet, elegido por su ventana de contexto extensa
-  (necesaria para mantener coherencia en sesiones de 10+ turnos) y su capacidad
-  de seguir instrucciones complejas.
-- Costo aproximado de referencia: ~$3 USD por millón de tokens de entrada, ~$15
-  por millón de salida. El presupuesto total estimado para desarrollo y pruebas
-  es de $5 a $10 USD. Diseñar la arquitectura para minimizar llamadas
-  innecesarias al modelo.
+- Costo: ~$0.80 entrada, ~$4 salida por millón de tokens.
+- Presupuesto estimado para desarrollo y pruebas: $2-3 USD (vs $5-10 con Sonnet).
+
+### OpenAI (STT + TTS para voz)
+
+- Se necesita una API key de OpenAI (platform.openai.com), distinta de ChatGPT.
+- Modelos: Whisper para transcripción (STT), TTS para generación de voz.
+- Costos: ~$0.01 USD por minuto de audio (Whisper), ~$0.015 por 1000 caracteres
+  (TTS). Muy económico comparado con soluciones especializadas.
+- La key se guarda en `backend/.env` como variable de entorno, nunca en código.
+
+### Vercel AI SDK
+
+- Librería que abstrae proveedores (Anthropic, OpenAI, etc.) con interfaz única.
+- Se usa `generateObject` + Zod para structured output en lugar de JSON schemas brutos.
+- Simplifica cambios de proveedor: si Anthropic saca un modelo nuevo o se quiere
+  cambiar de provider, solo se toca la config, no toda la lógica.
