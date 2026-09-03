@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack -p 5173",
-    "build": "next build --turbopack",
+    "build": "prisma migrate deploy && next build --turbopack",
     "start": "next start -p 5173",
     "lint": "eslint",
     "postinstall": "node scripts/copiar-worker-pdf.js"
