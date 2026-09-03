@@ -12,7 +12,7 @@ import {
 } from '../prompts/entrevistador';
 import { promptReporte, esquemaReporte } from '../prompts/reporte';
 
-const MODELO_ENTREVISTA = process.env.GOOGLE_GENERATIVE_AI_MODEL || 'gemini-1.5-flash';
+const MODELO_ENTREVISTA = process.env.GOOGLE_GENERATIVE_AI_MODEL || 'gemini-3.6-flash';
 const modeloEntrevistadorAI = google(MODELO_ENTREVISTA);
 
 // ===== AUTENTICACIÓN =====
@@ -66,7 +66,7 @@ export async function generarApertura({ tipo, puesto, cantidadPreguntas }) {
     schema: esquemaApertura,
   });
 
-  return { texto: resultado.mensaje };
+  return { texto: resultado.object.mensaje };
 }
 
 export async function decidirTurno({
@@ -101,7 +101,7 @@ export async function decidirTurno({
     schema: esquemaDecidirTurno(puedeRepreguntar),
   });
 
-  const { accion, mensaje } = resultado;
+  const { accion, mensaje } = resultado.object;
   const esRepregunta = accion === 'repregunta';
 
   if (esRepregunta) {
@@ -145,7 +145,7 @@ export async function generarReporte({ tipo, puesto, cantidadRepreguntas, mensaj
     schema: esquemaReporte,
   });
 
-  const datos = resultado;
+  const datos = resultado.object;
   const acotar = (n) => Math.max(0, Math.min(100, Math.round(Number(n) || 0)));
 
   return {
