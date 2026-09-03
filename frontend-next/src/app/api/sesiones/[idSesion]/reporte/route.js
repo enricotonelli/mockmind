@@ -2,6 +2,36 @@ import prisma from '@/lib/prisma';
 import { middleware401, respuestaError, respuestaOk } from '@/lib/auth';
 import { generarReporte, calcularPuntajeGeneral } from '@/lib/services';
 
+export async function GET(request, { params }) {
+  try {
+    const auth = await middleware401(request);
+    if (auth.error) return auth;
+
+    const { idSesion } = params;
+
+    const sesion = await prisma.sesion.findUnique({ where: { id: idSesion } });
+
+    if (!sesion) {
+      return respuestaError('Sesión no encontrada', 404);
+    }
+
+    if (sesion.idUsuario !== auth.usuario.id) {
+      return respuestaError('No autorizado', 403);
+    }
+
+    const reporte = await prisma.reporteEntrevista.findUnique({ where: { idSesion } });
+
+    if (!reporte) {
+      return respuestaError('Todavía no se generó el reporte de esta sesión', 404);
+    }
+
+    return respuestaOk({ reporte });
+  } catch (error) {
+    console.error('Error al obtener reporte:', error);
+    return respuestaError(error.message || 'Error al obtener reporte', 500);
+  }
+}
+
 export async function POST(request, { params }) {
   try {
     const auth = await middleware401(request);
