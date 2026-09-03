@@ -45,7 +45,7 @@ docker run --name mockmind-postgres \
 DATABASE_URL="postgresql://postgres:password@localhost:5432/mockmind_dev"
 ```
 
-## Paso 3: Configurar variables de entorno
+## Paso 3: Configurar variables de entorno (GRATIS)
 
 Crear/actualizar `frontend-next/.env.local`:
 
@@ -60,19 +60,23 @@ DATABASE_URL="postgresql://postgres:password@localhost:5432/mockmind_dev"
 # JWT (cambiar en producción)
 JWT_SECRET="secreto-desarrollo-cambiar-en-prod"
 
-# AI SDK - Claude Haiku (obtener en console.anthropic.com)
-# Usado por ai-sdk.dev para: entrevistador, análisis de respuestas
-ANTHROPIC_API_KEY="sk-ant-..."
+# Google Gemini (FREE TIER: 15 requests/min)
+# Obtener en: https://aistudio.google.com/apikey
+# Free tier suficiente para desarrollo (~1-2 sesiones/día)
+GOOGLE_GENERATIVE_AI_API_KEY="AIz..."
 
-# AI SDK - OpenAI (obtener en platform.openai.com)
-# Usado por ai-sdk.dev para: Whisper (STT), TTS (Speech)
-OPENAI_API_KEY="sk-..."
+# Modelo (gemini-1.5-flash es rápido y en free tier)
+GOOGLE_GENERATIVE_AI_MODEL="gemini-1.5-flash"
 
-# Modelo de IA (Haiku: 5-6x más barato que Sonnet)
-CLAUDE_INTERVIEW_MODEL="claude-haiku-4-5-20251001"
+# Voz (STT/TTS): Web Speech API del navegador - GRATIS 100%
+# No requiere API key, corre todo en el cliente
 ```
 
-**Nota importante:** Las API keys se usan **a través de AI SDK** (https://ai-sdk.dev/), no directamente. El código nunca hace llamadas HTTP directas a Anthropic/OpenAI; todo pasa por el AI SDK.
+**Costo: $0** ✅
+
+**Limitaciones:**
+- Google Gemini free tier: 15 requests/min (~1-2 entrevistas/día)
+- Web Speech API: disponible en navegadores modernos (Chrome, Firefox, Safari, Edge)
 
 ## Paso 4: Crear tablas (primera vez)
 

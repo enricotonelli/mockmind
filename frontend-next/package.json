@@ -10,8 +10,7 @@
     "postinstall": "node scripts/copiar-worker-pdf.js"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "latest",
-    "@ai-sdk/openai": "latest",
+    "@ai-sdk/google": "latest",
     "@prisma/client": "^6.5.0",
     "ai": "latest",
     "axios": "^1.20.0",

@@ -2,32 +2,34 @@
 
 Cómo se usa AI SDK en MockMind. **TODO pasa por https://ai-sdk.dev/, no hay llamadas HTTP directas.**
 
-## Instalación
+## Instalación (GRATIS)
 
 ```bash
-npm install ai @ai-sdk/anthropic @ai-sdk/openai
+npm install ai @ai-sdk/google
 ```
 
 ## Variables de entorno requeridas
 
 ```env
-# Credenciales (obtenidas de sus consolas, pero usadas VÍA AI SDK)
-ANTHROPIC_API_KEY="sk-ant-..."
-OPENAI_API_KEY="sk-..."
+# Google Gemini (FREE TIER: 15 requests/min)
+# Obtener en https://aistudio.google.com/apikey
+GOOGLE_GENERATIVE_AI_API_KEY="AIz..."
 
-# Configuración de modelo
-CLAUDE_INTERVIEW_MODEL="claude-haiku-4-5-20251001"
+# Modelo
+GOOGLE_GENERATIVE_AI_MODEL="gemini-1.5-flash"
+
+# Nota: Voz (STT/TTS) usa Web Speech API del navegador - GRATIS
 ```
 
 ## Cómo se usa en MockMind
 
-### 1. Reasoning — Claude Haiku (entrevistador)
+### 1. Reasoning — Google Gemini 1.5 Flash (entrevistador)
 
 ```javascript
 import { generateObject } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
+import { google } from '@ai-sdk/google';
 
-const modelo = anthropic('claude-haiku-4-5-20251001');
+const modelo = google('gemini-1.5-flash');
 
 const resultado = await generateObject({
   model: modelo,
@@ -39,6 +41,8 @@ const resultado = await generateObject({
 // resultado.texto contiene la pregunta del entrevistador
 ```
 
+**Costo:** FREE TIER (15 requests/min) = ~$0 ✅
+
 **Ubicación en el código:** [`src/lib/services.js`](./frontend-next/src/lib/services.js:63-72)
 
 **Funciones que lo usan:**
@@ -46,43 +50,46 @@ const resultado = await generateObject({
 - `decidirTurno()` — siguiente pregunta o repregunta
 - `generarReporte()` — análisis y feedback
 
-### 2. Speech-to-Text (STT) — Whisper
+### 2. Speech-to-Text (STT) — Web Speech API
 
 ```javascript
-import { experimental_transcribe } from 'ai';
-import { openai } from '@ai-sdk/openai';
+// Corre en el CLIENTE, no requiere backend
 
-const resultado = await experimental_transcribe({
-  model: openai.audio.transcription('whisper-1'),
-  audio: audioBuffer, // Buffer de audio WAV/MP3
-  language: 'es',
-});
+const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+recognition.lang = 'es-ES';
 
-// resultado.text contiene la transcripción en español
+recognition.onresult = (event) => {
+  const transcript = event.results[event.results.length - 1][0].transcript;
+  console.log('Transcripción:', transcript);
+};
+
+recognition.start();
 ```
 
-**Ubicación en el código:** [`src/lib/services.js`](./frontend-next/src/lib/services.js:176-184)
+**Costo:** FREE (navegador nativo) ✅
 
-**Endpoint:** `POST /api/voz/transcribir`
+**Ubicación en el código:** [`src/components/PanelRespuestaConVoz.jsx`](./frontend-next/src/components/PanelRespuestaConVoz.jsx)
 
-### 3. Text-to-Speech (TTS)
+**Soporte:** Chrome, Firefox, Safari, Edge (no IE)
+
+### 3. Text-to-Speech (TTS) — Web Speech API
 
 ```javascript
-import { experimental_generateSpeech } from 'ai';
-import { openai } from '@ai-sdk/openai';
+// Corre en el CLIENTE, no requiere backend
 
-const audioBuffer = await experimental_generateSpeech({
-  model: openai.audio.speech('tts-1'),
-  text: "Pregunta del entrevistador",
-  voice: 'nova', // Voces: alloy, echo, fable, onyx, shimmer, nova
-});
+const utterance = new SpeechSynthesisUtterance("Pregunta del entrevistador");
+utterance.lang = 'es-ES';
+utterance.rate = 0.9; // Velocidad (0.1 - 10)
+utterance.pitch = 1.0; // Tono (0 - 2)
 
-// audioBuffer es un Buffer binario de audio MP3
+window.speechSynthesis.speak(utterance);
 ```
 
-**Ubicación en el código:** [`src/lib/services.js`](./frontend-next/src/lib/services.js:186-192)
+**Costo:** FREE (navegador nativo) ✅
 
-**Endpoint:** `POST /api/voz/hablar`
+**Ubicación en el código:** [`src/components/ReproductorAudio.jsx`](./frontend-next/src/components/ReproductorAudio.jsx)
+
+**Soporte:** Chrome, Firefox, Safari, Edge (no IE)
 
 ## Prompts estructurados con Zod
 
@@ -133,62 +140,80 @@ const resultado = await generateObject({
    → Si audio: /api/voz/hablar [AI SDK: experimental_generateSpeech]
 ```
 
-## Costos (aproximado)
+## Costos (GRATIS HASTA NOVIEMBRE)
 
 | Operación | Modelo | Costo |
 |-----------|--------|-------|
-| Entrevistador (4 turnos × 3 preguntas) | Haiku | ~$0.10–0.20 |
-| Reporte | Haiku | ~$0.05–0.10 |
-| 1 minuto de audio (STT) | Whisper | ~$0.02 |
-| 500 caracteres de audio (TTS) | TTS | ~$0.01 |
-| **Una entrevista completa** | — | **~$0.18–0.33** |
+| Entrevistador (4 turnos × 3 preguntas) | Gemini Flash (free tier) | ~$0 ✅ |
+| Reporte | Gemini Flash (free tier) | ~$0 ✅ |
+| STT (speech-to-text) | Web Speech API | ~$0 ✅ |
+| TTS (text-to-speech) | Web Speech API | ~$0 ✅ |
+| **Una entrevista completa** | — | **~$0** ✅ |
+| **100 sesiones/mes** | — | **~$0** ✅ |
 
-**Ahorro vs Sonnet:** Haiku es 5-6x más barato pero suficiente para entrevistas estructuradas.
+**Limitación:** Google Gemini free tier = 15 requests/min (~1-2 sesiones/día)
+
+**Después (noviembre):** cambiar a Anthropic Haiku si necesitas más capacidad (~$2–5/mes)
 
 ## Troubleshooting
 
-### Error: "ANTHROPIC_API_KEY not found"
+### Error: "GOOGLE_GENERATIVE_AI_API_KEY not found"
 ```
 → Verificar que esté en .env.local o en Vercel Environment Variables
+→ Obtener en https://aistudio.google.com/apikey
 → Reiniciar servidor
 ```
 
-### Error: "No such model: claude-haiku..."
+### Error: 429 "Rate limit exceeded"
 ```
-→ Verificar que CLAUDE_INTERVIEW_MODEL esté bien escrito
-→ Usar: claude-haiku-4-5-20251001 (exacto)
-```
-
-### STT no funciona
-```
-→ El audio debe ser WAV o MP3
-→ OPENAI_API_KEY debe estar configurada
-→ Máximo 25MB por audio
+→ Google Gemini free tier: 15 requests/min
+→ Esperar 1-2 minutos antes de siguiente entrevista
+→ En noviembre: cambiar a Anthropic si necesitas más
 ```
 
-### TTS suena raro
+### Error: "Model not found: gemini-1.5-flash"
 ```
-→ Probar otras voces: alloy, echo, fable, onyx, shimmer
-→ Acortar el texto (chunks de 500 caracteres max para mejor calidad)
+→ Verificar API key es válida en https://aistudio.google.com/apikey
+→ Usar: gemini-1.5-flash (exacto)
 ```
 
-## Cambiar modelos (fácil con AI SDK)
+### STT no funciona (Web Speech API)
+```
+→ Navegador debe soportarlo: Chrome, Firefox, Safari, Edge (no IE)
+→ Micrófono debe estar permitido en el navegador
+→ Idioma debe ser 'es-ES' para español
+```
 
-Querer cambiar a Claude Sonnet? Solo cambiar una línea:
+### TTS suena raro (Web Speech API)
+```
+→ Probar ajustar rate (velocidad): 0.5 - 1.5
+→ Probar ajustar pitch (tono): 0.5 - 2.0
+→ Acortar el texto (máx ~500 caracteres recomendado)
+```
+
+## Cambiar modelos (fácil con AI SDK) — Para noviembre
+
+Cuando necesites pagar y cambiar de Gemini a Anthropic:
 
 ```javascript
-// Antes:
+// AHORA (gratis):
+import { google } from '@ai-sdk/google';
+const modelo = google('gemini-1.5-flash');
+
+// NOVIEMBRE (pago, pero más potente):
+import { anthropic } from '@ai-sdk/anthropic';
 const modelo = anthropic('claude-haiku-4-5-20251001');
 
-// Después (3x más caro, pero más potente):
-const modelo = anthropic('claude-opus-5-20250514');
-
-// O usar outro provider:
+// O probar GPT:
 import { openai } from '@ai-sdk/openai';
-const modelo = openai('gpt-4o'); // Compatible con generateObject
+const modelo = openai('gpt-4o-mini'); // Compatible con generateObject
 ```
 
 **Ventaja de AI SDK:** cambiar proveedores es trivial, todo el código sigue igual.
+
+**Plan:**
+- Septiembre–octubre: Gemini free tier (gratis)
+- Noviembre: cambiar a Anthropic Haiku (pago, $2–5/mes)
 
 ## Referencias
 

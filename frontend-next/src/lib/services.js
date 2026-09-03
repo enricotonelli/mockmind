@@ -2,9 +2,7 @@ import bcrypt from 'bcrypt';
 import prisma from './prisma';
 import { crearToken } from './auth';
 import { generateObject } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
-import { openai } from '@ai-sdk/openai';
-import { experimental_transcribe, experimental_generateSpeech } from 'ai';
+import { google } from '@ai-sdk/google';
 import {
   promptApertura,
   promptTurno,
@@ -14,8 +12,8 @@ import {
 } from '../prompts/entrevistador';
 import { promptReporte, esquemaReporte } from '../prompts/reporte';
 
-const MODELO_ENTREVISTA = process.env.CLAUDE_INTERVIEW_MODEL || 'claude-haiku-4-5-20251001';
-const modeloEntrevistadorAI = anthropic(MODELO_ENTREVISTA);
+const MODELO_ENTREVISTA = process.env.GOOGLE_GENERATIVE_AI_MODEL || 'gemini-1.5-flash';
+const modeloEntrevistadorAI = google(MODELO_ENTREVISTA);
 
 // ===== AUTENTICACIÓN =====
 
@@ -171,22 +169,20 @@ function calcularPuntajeGeneral(dimensiones) {
 
 export { calcularPuntajeGeneral };
 
-// ===== VOZ =====
+// ===== VOZ (Web Speech API — gratis, corre en el navegador) =====
+
+// Nota: STT y TTS usan Web Speech API del navegador (100% gratis)
+// No requieren backend, se ejecutan en el cliente
+// Ver: src/components/PanelRespuestaConVoz.jsx
 
 export async function transcribirAudio(audioBuffer) {
-  const resultado = await experimental_transcribe({
-    model: openai.audio.transcription('whisper-1'),
-    audio: audioBuffer,
-    language: 'es',
-  });
-
-  return resultado.text;
+  // STT se maneja en el cliente con Web Speech API
+  // Este es un placeholder por si se necesita en el futuro
+  throw new Error('STT debe usarse con Web Speech API en el cliente, no en el servidor');
 }
 
 export async function generarAudioDesdeTexto(texto) {
-  return await experimental_generateSpeech({
-    model: openai.audio.speech('tts-1'),
-    text: texto,
-    voice: 'nova',
-  });
+  // TTS se maneja en el cliente con Web Speech API
+  // Este es un placeholder por si se necesita en el futuro
+  throw new Error('TTS debe usarse con Web Speech API en el cliente, no en el servidor');
 }

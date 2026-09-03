@@ -162,14 +162,14 @@ Escalable sin costo fijo. Solo pagas por uso.
 - PostgreSQL: escalable, free tier en Supabase
 - Connection pooling en dev/prod
 
-### IA (vía AI SDK)
-- **Claude Haiku** (via AI SDK): 5-6x más barato que Sonnet, suficiente para entrevistas
+### IA (vía AI SDK — TODO GRATIS HASTA NOVIEMBRE)
+- **Google Gemini 1.5 Flash** (via AI SDK): FREE TIER
   - Reasoning: entrevistador, análisis de respuestas
-  - ~$0.80 entrada, ~$4 salida por millón de tokens
-- **OpenAI Whisper** (via AI SDK): STT (speech-to-text)
-  - ~$0.02 por minuto de audio
-- **OpenAI TTS** (via AI SDK): TTS (text-to-speech)
-  - ~$0.015 por 1K caracteres
+  - Free tier: 15 requests/min (~1-2 sesiones/día)
+  - Costo después: ~$1–2/mes con 100 sesiones/mes
+- **Web Speech API** (navegador nativo): STT + TTS
+  - 100% gratis, corre en el cliente
+  - Disponible en Chrome, Firefox, Safari, Edge
 - **Nota:** TODO pasa por https://ai-sdk.dev/, no llamadas HTTP directas
 
 ## 🔗 Enlaces útiles

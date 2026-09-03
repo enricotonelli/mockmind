@@ -43,34 +43,35 @@ npx prisma migrate dev --name initial
 
 Esto crea todas las tablas en Supabase automáticamente.
 
-## Paso 2: Preparar variables de entorno
+## Paso 2: Preparar variables de entorno (GRATIS HASTA NOVIEMBRE)
 
 Crear un archivo `.env.production.local` en `frontend-next/` con:
 
 ```env
-# Base de datos (desde Supabase)
+# Base de datos (desde Supabase free tier)
 DATABASE_URL="postgresql://..."
 
 # JWT (generar una cadena larga aleatoria)
 JWT_SECRET="generar-con-crypto-random-en-produccion"
 
-# AI SDK - Claude Haiku (Anthropic)
-# Obtener en https://console.anthropic.com
-# Usado para: entrevistador, análisis de respuestas
-ANTHROPIC_API_KEY="sk-ant-..."
+# Google Gemini (FREE TIER: 15 requests/min)
+# Obtener en https://aistudio.google.com/apikey
+# Suficiente para ~1-2 sesiones/día
+GOOGLE_GENERATIVE_AI_API_KEY="AIz..."
 
-# AI SDK - OpenAI
-# Obtener en https://platform.openai.com
-# Usado para: Whisper (STT), TTS (Speech)
-OPENAI_API_KEY="sk-..."
-
-# Modelo de IA (Haiku: más barato y suficiente para entrevistas)
-CLAUDE_INTERVIEW_MODEL="claude-haiku-4-5-20251001"
+# Modelo
+GOOGLE_GENERATIVE_AI_MODEL="gemini-1.5-flash"
 ```
+
+**Costo: $0 hasta noviembre** ✅
+
+**Limitaciones:**
+- Google Gemini free tier: 15 reqs/min
+- Web Speech API: gratis, navegador nativo
+- En noviembre: cambiar a Anthropic si necesitas más capacidad
 
 **⚠️ IMPORTANTE:** 
 - No commitear este archivo. Ya está en `.gitignore`
-- Las API keys se usan **vía AI SDK** (https://ai-sdk.dev/), no llamadas HTTP directas
 - Vercel manejará estas variables automáticamente como "Environment Variables"
 
 ## Paso 3: Pushear a GitHub
