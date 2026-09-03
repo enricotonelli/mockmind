@@ -6,7 +6,7 @@ async function transcribir(archivoAudio) {
   const formData = new FormData();
   formData.append('audio', archivoAudio);
 
-  const { data } = await client.post('/api/voz/transcribir', formData, {
+  const { data } = await client.post('/voz/transcribir', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -19,7 +19,7 @@ async function transcribir(archivoAudio) {
 // Envía texto y recibe un archivo de audio en formato MP3
 async function hablar(texto) {
   const { data } = await client.post(
-    '/api/voz/hablar',
+    '/voz/hablar',
     { texto },
     {
       responseType: 'blob', // Esperar un archivo binario de audio

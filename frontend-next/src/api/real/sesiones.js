@@ -6,7 +6,7 @@
 import apiClient from '../client';
 
 export async function crearSesion({ puestoAplicado, tipoEntrevista, cantidadPreguntas }) {
-  const { data } = await apiClient.post('/api/sesiones/crear', {
+  const { data } = await apiClient.post('/sesiones/crear', {
     puesto: puestoAplicado,
     tipoEntrevista,
     cantidadPreguntas,
@@ -15,12 +15,12 @@ export async function crearSesion({ puestoAplicado, tipoEntrevista, cantidadPreg
 }
 
 export async function obtenerSesion(sesionId) {
-  const { data } = await apiClient.get(`/api/sesiones/${sesionId}/detalles`);
+  const { data } = await apiClient.get(`/sesiones/${sesionId}/detalles`);
   return { sesion: data.sesion, mensajes: data.mensajes };
 }
 
 export async function responder({ sesionId, respuesta }) {
-  const { data } = await apiClient.post(`/api/sesiones/${sesionId}/turno`, { respuesta });
+  const { data } = await apiClient.post(`/sesiones/${sesionId}/turno`, { respuesta });
   return {
     mensaje: data.mensaje,
     esRepregunta: data.esRepregunta,
@@ -30,37 +30,37 @@ export async function responder({ sesionId, respuesta }) {
 }
 
 export async function generarApertura(sesionId) {
-  const { data } = await apiClient.post(`/api/sesiones/${sesionId}/apertura`);
+  const { data } = await apiClient.post(`/sesiones/${sesionId}/apertura`);
   return data;
 }
 
 export async function finalizarSesion(sesionId) {
-  const { data } = await apiClient.post(`/api/sesiones/${sesionId}/reporte`);
+  const { data } = await apiClient.post(`/sesiones/${sesionId}/reporte`);
   return data.reporte;
 }
 
 export async function obtenerReporte(sesionId) {
-  const { data } = await apiClient.get(`/api/sesiones/${sesionId}/reporte`);
+  const { data } = await apiClient.get(`/sesiones/${sesionId}/reporte`);
   return data.reporte;
 }
 
 export async function listarSesiones() {
-  const { data } = await apiClient.get('/api/sesiones');
+  const { data } = await apiClient.get('/sesiones');
   return data.sesiones;
 }
 
 export async function listarEnCurso() {
-  const { data } = await apiClient.get('/api/sesiones');
+  const { data } = await apiClient.get('/sesiones');
   // Filtrar sesiones no finalizadas en el cliente
   return (data.sesiones || []).filter((s) => !s.finalizada);
 }
 
 export async function eliminarSesion(sesionId) {
-  await apiClient.delete(`/api/sesiones/${sesionId}`);
+  await apiClient.delete(`/sesiones/${sesionId}`);
 }
 
 export async function obtenerResumen() {
-  const { data } = await apiClient.get('/api/sesiones');
+  const { data } = await apiClient.get('/sesiones');
   const sesiones = data.sesiones || [];
 
   const finalizadas = sesiones.filter((s) => s.finalizada);
