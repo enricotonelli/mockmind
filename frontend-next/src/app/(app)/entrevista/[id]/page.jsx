@@ -6,6 +6,7 @@ import { sesiones as apiSesiones } from '../../../../api';
 import EtiquetaTipo from '../../../../components/EtiquetaTipo';
 import BurbujaMensaje from '../../../../components/BurbujaMensaje';
 import IndicadorEscribiendo from '../../../../components/IndicadorEscribiendo';
+import PanelRespuestaConVoz from '../../../../components/PanelRespuestaConVoz';
 import Boton from '../../../../components/Boton';
 
 const TOTAL_PREGUNTAS = 6;
@@ -205,40 +206,18 @@ function Entrevista() {
         </div>
       </div>
 
-      {/* Cuadro de respuesta */}
+      {/* Panel de respuesta (texto o voz) */}
       <div className="border-t border-borde bg-fondo px-5 py-4 sm:px-8">
         <div className="mx-auto max-w-3xl">
           {error && <p className="mb-2 text-sm text-acento">{error}</p>}
 
-          <div className="flex items-end gap-2 rounded-2xl border border-borde bg-superficie p-2 transition focus-within:border-acento focus-within:ring-2 focus-within:ring-acento/20">
-            <textarea
-              ref={textareaRef}
-              rows={1}
-              value={respuesta}
-              disabled={pensando || terminada || finalizando}
-              onChange={(e) => {
-                setRespuesta(e.target.value);
-                ajustarAltura(e.target);
-              }}
-              onKeyDown={alPresionarTecla}
-              placeholder={
-                terminada ? 'La entrevista terminó' : 'Escribí tu respuesta…'
-              }
-              className="max-h-[200px] flex-1 resize-none bg-transparent px-2.5 py-2 text-sm leading-relaxed text-texto placeholder:text-texto-tenue focus:outline-none disabled:opacity-50"
-            />
-
-            <button
-              onClick={enviar}
-              disabled={!respuesta.trim() || pensando || terminada || finalizando}
-              className="flex h-9 shrink-0 items-center justify-center rounded-xl bg-acento px-4 text-sm font-medium text-acento-texto transition hover:brightness-110 disabled:opacity-30"
-            >
-              Enviar
-            </button>
-          </div>
-
-          <p className="mt-2 px-1 text-xs text-texto-tenue">
-            Enter para enviar · Shift + Enter para hacer un salto de línea
-          </p>
+          <PanelRespuestaConVoz
+            respuestaTexto={respuesta}
+            onRespuestaTextoChange={setRespuesta}
+            onResponder={enviar}
+            deshabilitado={pensando || terminada || finalizando}
+            enProceso={pensando || finalizando}
+          />
         </div>
       </div>
     </div>

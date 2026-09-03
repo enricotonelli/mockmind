@@ -4,22 +4,29 @@
 // servicio a partir de los mensajes guardados (ver sesiones.controller.js) y
 // se le pasa explícitamente a cada función: este archivo no guarda nada.
 
-const { anthropic, MODELO } = require('../config/anthropic');
+const { generateObject } = require('ai');
+const { modeloEntrevistadorAI } = require('../config/anthropic');
 const { ErrorApi } = require('../middleware/manejoErrores');
 const {
   promptApertura,
   promptTurno,
-  herramientaDecidirTurno,
-  HERRAMIENTA_APERTURA,
+  MAXIMO_REPREGUNTAS_SEGUIDAS,
+  esquemaApertura,
+  esquemaDecidirTurno,
 } = require('../prompts/entrevistador');
 
-const MAX_TOKENS_TURNO = 500;
-
-async function llamarClaude(params) {
+// Función helper para llamar al LLM con generateObject
+async function llamarClaude(prompt, schema, system) {
   try {
-    return await anthropic.messages.create(params);
+    const resultado = await generateObject({
+      model: modeloEntrevistadorAI,
+      system,
+      prompt,
+      schema,
+    });
+    return resultado.object;
   } catch (error) {
-    console.error('Error llamando a la API de Anthropic:', error);
+    console.error('Error llamando a Vercel AI SDK:', error);
     throw new ErrorApi(
       502,
       'No se pudo conectar con el entrevistador en este momento. Probá de nuevo en unos segundos.'
@@ -27,32 +34,15 @@ async function llamarClaude(params) {
   }
 }
 
-// Busca el bloque de uso de herramienta en la respuesta de Claude. Si no
-// está (no debería pasar con tool_choice forzado, pero una API externa
-// siempre puede sorprender), se trata como una falla del entrevistador.
-function extraerHerramienta(respuesta, nombreEsperado) {
-  const bloque = respuesta.content.find(
-    (b) => b.type === 'tool_use' && b.name === nombreEsperado
-  );
-  if (!bloque) {
-    throw new ErrorApi(502, 'El entrevistador no respondió correctamente. Probá de nuevo.');
-  }
-  return bloque.input;
-}
-
 // Genera el saludo inicial y la primera pregunta.
 async function generarApertura({ tipo, puesto, cantidadPreguntas }) {
-  const respuesta = await llamarClaude({
-    model: MODELO,
-    max_tokens: MAX_TOKENS_TURNO,
-    system: promptApertura({ tipo, puesto, cantidadPreguntas }),
-    messages: [{ role: 'user', content: 'Empezá la entrevista.' }],
-    tools: [HERRAMIENTA_APERTURA],
-    tool_choice: { type: 'tool', name: 'abrir_entrevista' },
-  });
+  const resultado = await llamarClaude(
+    'Empezá la entrevista.',
+    esquemaApertura,
+    promptApertura({ tipo, puesto, cantidadPreguntas })
+  );
 
-  const { mensaje } = extraerHerramienta(respuesta, 'abrir_entrevista');
-  return { texto: mensaje };
+  return { texto: resultado.mensaje };
 }
 
 // Decide el siguiente turno a partir de la respuesta del candidato.
@@ -68,30 +58,31 @@ async function decidirTurno({
   respuesta,
 }) {
   const esUltimaPregunta = indicePregunta + 1 >= cantidadPreguntas;
+  const puedeRepreguntar = repreguntasSeguidas < MAXIMO_REPREGUNTAS_SEGUIDAS;
 
-  const historial = mensajesPrevios.map((m) => ({
-    role: m.rol === 'usuario' ? 'user' : 'assistant',
-    content: m.contenido,
-  }));
-  historial.push({ role: 'user', content: respuesta });
+  // Construir el historial de la conversación
+  const historial = mensajesPrevios
+    .map((m) => `${m.rol === 'usuario' ? 'Candidato' : 'Entrevistador'}: ${m.contenido}`)
+    .join('\n\n');
 
-  const respuestaClaude = await llamarClaude({
-    model: MODELO,
-    max_tokens: MAX_TOKENS_TURNO,
-    system: promptTurno({
+  const prompt = `${historial}
+
+Candidato: ${respuesta}`;
+
+  const resultado = await llamarClaude(
+    prompt,
+    esquemaDecidirTurno(puedeRepreguntar),
+    promptTurno({
       tipo,
       puesto,
       cantidadPreguntas,
       indicePregunta,
       repreguntasSeguidas,
       esUltimaPregunta,
-    }),
-    messages: historial,
-    tools: [herramientaDecidirTurno({ repreguntasSeguidas })],
-    tool_choice: { type: 'tool', name: 'decidir_turno' },
-  });
+    })
+  );
 
-  const { accion, mensaje } = extraerHerramienta(respuestaClaude, 'decidir_turno');
+  const { accion, mensaje } = resultado;
   const esRepregunta = accion === 'repregunta';
 
   if (esRepregunta) {

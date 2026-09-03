@@ -7,6 +7,8 @@
 // lleva el backend, no Claude: se le pasa explícitamente en cada turno para
 // no depender de que lo infiera solo de un historial largo.
 
+const { z } = require('zod');
+
 const NOMBRES_TIPO = {
   RRHH: 'de Recursos Humanos (competencias blandas, trayectoria profesional, motivaciones)',
   Tecnica: 'técnica (conocimientos específicos del área del puesto)',
@@ -141,10 +143,24 @@ const HERRAMIENTA_APERTURA = {
   },
 };
 
+// Esquemas Zod para Vercel AI SDK (generateObject)
+const esquemaApertura = z.object({
+  mensaje: z.string().describe('El saludo breve seguido de la primera pregunta.'),
+});
+
+const esquemaDecidirTurno = (puedeRepreguntar) => z.object({
+  accion: z.enum(puedeRepreguntar ? ['repregunta', 'avanzar'] : ['avanzar']).describe(
+    'repregunta: pedís que profundice la respuesta actual. avanzar: la respuesta está completa, seguís con la próxima pregunta (o cerrás si era la última).'
+  ),
+  mensaje: z.string().describe('El texto exacto que le decís al candidato en este turno.'),
+});
+
 module.exports = {
   MAXIMO_REPREGUNTAS_SEGUIDAS,
   promptApertura,
   promptTurno,
   herramientaDecidirTurno,
   HERRAMIENTA_APERTURA,
+  esquemaApertura,
+  esquemaDecidirTurno,
 };

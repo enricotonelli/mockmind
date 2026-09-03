@@ -4,6 +4,8 @@
 // dimensión (CLAUDE.md §7), para que el reporte tenga correspondencia real
 // con lo que pasó en la sesión (§11).
 
+const { z } = require('zod');
+
 function promptReporte({ tipo, puesto, cantidadRepreguntas }) {
   return `Sos un evaluador experto de entrevistas laborales. Acabás de terminar de entrevistar a un candidato (entrevista de tipo ${tipo}) para este puesto:
 """
@@ -57,4 +59,14 @@ const HERRAMIENTA_REPORTE = {
   },
 };
 
-module.exports = { promptReporte, HERRAMIENTA_REPORTE };
+// Esquema Zod para Vercel AI SDK
+const esquemaReporte = z.object({
+  puntajeClaridad: z.number().int().min(0).max(100).describe('Puntaje de claridad (0-100)'),
+  puntajeStar: z.number().int().min(0).max(100).describe('Puntaje de método STAR (0-100)'),
+  puntajeEjemplos: z.number().int().min(0).max(100).describe('Puntaje de ejemplos (0-100)'),
+  puntajeCoherencia: z.number().int().min(0).max(100).describe('Puntaje de coherencia (0-100)'),
+  feedbackTexto: z.string().describe('Análisis de 3-5 oraciones sobre el desempeño'),
+  sugerencias: z.array(z.string()).min(2).max(5).describe('2-5 sugerencias para mejorar'),
+});
+
+module.exports = { promptReporte, HERRAMIENTA_REPORTE, esquemaReporte };
