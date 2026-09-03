@@ -10,7 +10,7 @@ export async function GET(request, { params }) {
 
     const sesion = await prisma.sesion.findUnique({
       where: { id: idSesion },
-      include: { mensajes: true },
+      include: { mensajes: { orderBy: { timestamp: 'asc' } } },
     });
 
     if (!sesion) {
@@ -21,7 +21,9 @@ export async function GET(request, { params }) {
       return respuestaError('No autorizado', 403);
     }
 
-    return respuestaOk({ sesion });
+    // Separar sesión de mensajes para que coincida con el contrato del mock
+    const { mensajes, ...datosSesion } = sesion;
+    return respuestaOk({ sesion: datosSesion, mensajes });
   } catch (error) {
     console.error('Error al obtener sesión:', error);
     return respuestaError(error.message || 'Error al obtener sesión', 500);

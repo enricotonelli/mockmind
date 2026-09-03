@@ -68,18 +68,31 @@ export async function POST(request, { params }) {
       },
     });
 
-    // Actualizar índice de pregunta si avanzó
-    if (!resultado.esRepregunta) {
+    // Actualizar sesión si avanzó o si finalizó
+    if (!resultado.esRepregunta || resultado.finalizada) {
       await prisma.sesion.update({
         where: { id: idSesion },
-        data: { indicePregunta: resultado.indicePregunta },
+        data: {
+          indicePregunta: resultado.indicePregunta,
+          finalizada: resultado.finalizada,
+        },
       });
     }
 
+    // Retornar estructura compatible con el mock
     return respuestaOk({
-      mensaje: resultado.texto,
+      mensaje: {
+        id: nuevoMensaje.id,
+        rol: 'entrevistador',
+        contenido: resultado.texto,
+        timestamp: nuevoMensaje.timestamp,
+      },
       esRepregunta: resultado.esRepregunta,
       finalizada: resultado.finalizada,
+      progreso: {
+        actual: (resultado.indicePregunta || 0) + 1,
+        total: sesion.cantidadPreguntas,
+      },
     });
   } catch (error) {
     console.error('Error en turno:', error);

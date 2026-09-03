@@ -16,12 +16,17 @@ export async function crearSesion({ puestoAplicado, tipoEntrevista, cantidadPreg
 
 export async function obtenerSesion(sesionId) {
   const { data } = await apiClient.get(`/api/sesiones/${sesionId}/detalles`);
-  return data.sesion;
+  return { sesion: data.sesion, mensajes: data.mensajes };
 }
 
 export async function responder({ sesionId, respuesta }) {
   const { data } = await apiClient.post(`/api/sesiones/${sesionId}/turno`, { respuesta });
-  return data;
+  return {
+    mensaje: data.mensaje,
+    esRepregunta: data.esRepregunta,
+    finalizada: data.finalizada,
+    progreso: data.progreso,
+  };
 }
 
 export async function generarApertura(sesionId) {
