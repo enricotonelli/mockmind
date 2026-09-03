@@ -6,49 +6,66 @@
 import apiClient from '../client';
 
 export async function crearSesion({ puestoAplicado, tipoEntrevista, cantidadPreguntas }) {
-  const { data } = await apiClient.post('/sesiones', {
-    puestoAplicado,
+  const { data } = await apiClient.post('/api/sesiones/crear', {
+    puesto: puestoAplicado,
     tipoEntrevista,
     cantidadPreguntas,
   });
-  return data;
+  return data.sesion;
 }
 
 export async function obtenerSesion(sesionId) {
-  const { data } = await apiClient.get(`/sesiones/${sesionId}`);
-  return data;
+  const { data } = await apiClient.get(`/api/sesiones/${sesionId}/detalles`);
+  return data.sesion;
 }
 
 export async function responder({ sesionId, respuesta }) {
-  const { data } = await apiClient.post(`/sesiones/${sesionId}/mensajes`, { respuesta });
+  const { data } = await apiClient.post(`/api/sesiones/${sesionId}/turno`, { respuesta });
+  return data;
+}
+
+export async function generarApertura(sesionId) {
+  const { data } = await apiClient.post(`/api/sesiones/${sesionId}/apertura`);
   return data;
 }
 
 export async function finalizarSesion(sesionId) {
-  const { data } = await apiClient.post(`/sesiones/${sesionId}/finalizar`);
-  return data;
+  const { data } = await apiClient.post(`/api/sesiones/${sesionId}/reporte`);
+  return data.reporte;
 }
 
 export async function obtenerReporte(sesionId) {
-  const { data } = await apiClient.get(`/sesiones/${sesionId}/reporte`);
-  return data;
+  const { data } = await apiClient.get(`/api/sesiones/${sesionId}/reporte`);
+  return data.reporte;
 }
 
 export async function listarSesiones() {
-  const { data } = await apiClient.get('/sesiones');
-  return data;
+  const { data } = await apiClient.get('/api/sesiones');
+  return data.sesiones;
 }
 
 export async function listarEnCurso() {
-  const { data } = await apiClient.get('/sesiones/en-curso');
-  return data;
+  const { data } = await apiClient.get('/api/sesiones');
+  // Filtrar sesiones no finalizadas en el cliente
+  return (data.sesiones || []).filter((s) => !s.finalizada);
 }
 
 export async function eliminarSesion(sesionId) {
-  await apiClient.delete(`/sesiones/${sesionId}`);
+  await apiClient.delete(`/api/sesiones/${sesionId}`);
 }
 
 export async function obtenerResumen() {
-  const { data } = await apiClient.get('/sesiones/resumen');
-  return data;
+  const { data } = await apiClient.get('/api/sesiones');
+  const sesiones = data.sesiones || [];
+
+  const finalizadas = sesiones.filter((s) => s.finalizada);
+  const promedioPuntaje = finalizadas.length > 0
+    ? finalizadas.reduce((sum, s) => sum + (s.puntajeGeneral || 0), 0) / finalizadas.length
+    : 0;
+
+  return {
+    totalSesiones: sesiones.length,
+    sesionesFinalizadas: finalizadas.length,
+    promedioPuntaje: Math.round(promedioPuntaje),
+  };
 }

@@ -10,17 +10,25 @@
     "postinstall": "node scripts/copiar-worker-pdf.js"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "latest",
+    "@ai-sdk/openai": "latest",
+    "@prisma/client": "^6.5.0",
+    "ai": "latest",
     "axios": "^1.20.0",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^8.5.1",
     "next": "15.5.25",
     "pdfjs-dist": "^4.10.38",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.5.25",
+    "prisma": "^6.5.0",
     "tailwindcss": "^4"
   }
 }

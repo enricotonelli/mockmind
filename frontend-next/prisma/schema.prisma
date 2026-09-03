@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  nombre    String
+  passwordHash String
+  fecha_registro DateTime @default(now())
+
+  sesiones Sesion[]
+
+  @@map("usuarios")
+}
+
+model Sesion {
+  id                  String   @id @default(cuid())
+  idUsuario           String
+  usuario             Usuario  @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+  puestoAplicado      String
+  tipoEntrevista      String   // RRHH, Tecnica, Estres
+  cantidadPreguntas   Int      @default(5)
+  indicePregunta      Int      @default(0)
+  fecha               DateTime @default(now())
+  duracion            Int?     // en segundos
+  puntajeGeneral      Int?
+  finalizada          Boolean  @default(false)
+
+  mensajes      Mensaje[]
+  reporteEntrevista ReporteEntrevista?
+
+  @@map("sesiones")
+}
+
+model Mensaje {
+  id            String   @id @default(cuid())
+  idSesion      String
+  sesion        Sesion   @relation(fields: [idSesion], references: [id], onDelete: Cascade)
+  rol           String   // "usuario" o "entrevistador"
+  contenido     String
+  esRepregunta  Boolean  @default(false)
+  timestamp     DateTime @default(now())
+
+  @@map("mensajes")
+}
+
+model ReporteEntrevista {
+  id                   String   @id @default(cuid())
+  idSesion             String   @unique
+  sesion               Sesion   @relation(fields: [idSesion], references: [id], onDelete: Cascade)
+  puntajeClaridad      Int
+  puntajeStar          Int
+  puntajeEjemplos      Int
+  puntajeCoherencia    Int
+  puntajeGeneral       Int?
+  cantidadRepreguntas  Int
+  feedbackTexto        String
+  sugerencias          String[]  // Array de strings en PostgreSQL
+
+  @@map("reportes_entrevista")
+}
