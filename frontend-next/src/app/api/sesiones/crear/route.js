@@ -2,6 +2,10 @@ import prisma from '@/lib/prisma';
 import { middleware401, respuestaError, respuestaOk } from '@/lib/auth';
 import { generarApertura } from '@/lib/services';
 
+// Gemini (modelo "thinking") puede tardar más que el límite por defecto de
+// 10s de las funciones serverless de Vercel en el plan Hobby.
+export const maxDuration = 60;
+
 export async function POST(request) {
   try {
     const auth = await middleware401(request);

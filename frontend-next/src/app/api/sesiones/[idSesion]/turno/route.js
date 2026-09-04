@@ -2,6 +2,8 @@ import prisma from '@/lib/prisma';
 import { middleware401, respuestaError, respuestaOk } from '@/lib/auth';
 import { decidirTurno } from '@/lib/services';
 
+export const maxDuration = 60;
+
 export async function POST(request, { params }) {
   try {
     const auth = await middleware401(request);

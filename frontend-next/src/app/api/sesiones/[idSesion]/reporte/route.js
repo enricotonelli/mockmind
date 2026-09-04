@@ -2,6 +2,8 @@ import prisma from '@/lib/prisma';
 import { middleware401, respuestaError, respuestaOk } from '@/lib/auth';
 import { generarReporte, calcularPuntajeGeneral } from '@/lib/services';
 
+export const maxDuration = 60;
+
 export async function GET(request, { params }) {
   try {
     const auth = await middleware401(request);
