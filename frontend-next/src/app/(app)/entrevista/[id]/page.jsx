@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { sesiones as apiSesiones } from '../../../../api';
+import { sesiones as apiSesiones, voz as apiVoz } from '../../../../api';
 import EtiquetaTipo from '../../../../components/EtiquetaTipo';
 import BurbujaMensaje from '../../../../components/BurbujaMensaje';
 import IndicadorEscribiendo from '../../../../components/IndicadorEscribiendo';
@@ -34,6 +34,7 @@ function Entrevista() {
   const [dispararGrabacion, setDispararGrabacion] = useState(0);
   const narradosRef = useRef(new Set());
   const cuentaRegresivaRef = useRef(null);
+  const audioNarracionRef = useRef(null);
 
   const finalRef = useRef(null);
   const textareaRef = useRef(null);
@@ -93,6 +94,10 @@ function Entrevista() {
   // Apenas aparece una pregunta nueva del entrevistador (recién cargada o
   // recién respondida), la lee en voz alta con resaltado tipo karaoke y,
   // cuando termina, arranca la cuenta regresiva para grabar solo.
+  //
+  // Primero intenta ElevenLabs (voz humana, vía backend); si falla o se
+  // agotó la cuota gratuita, cae sola a la voz sintética del navegador
+  // (Web Speech API) para no dejar la pregunta muda.
   useEffect(() => {
     if (terminada || finalizando || !mensajes.length) return;
 
@@ -100,45 +105,106 @@ function Entrevista() {
     if (ultimo.rol !== 'entrevistador' || narradosRef.current.has(ultimo.id)) return;
     narradosRef.current.add(ultimo.id);
 
-    if (typeof window === 'undefined' || !window.speechSynthesis) {
-      iniciarCuentaRegresiva();
-      return;
+    let cancelado = false;
+
+    function narrarConNavegador() {
+      if (typeof window === 'undefined' || !window.speechSynthesis) {
+        iniciarCuentaRegresiva();
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      setIdNarrando(ultimo.id);
+      setRangoNarrado([0, 0]);
+
+      const utterance = new SpeechSynthesisUtterance(ultimo.contenido);
+      utterance.lang = 'es-AR';
+      utterance.rate = 0.95;
+      utterance.onboundary = (evento) => {
+        const inicio = evento.charIndex ?? 0;
+        let fin = ultimo.contenido.indexOf(' ', inicio);
+        if (fin === -1) fin = ultimo.contenido.length;
+        setRangoNarrado([inicio, fin]);
+      };
+      utterance.onend = () => {
+        setIdNarrando(null);
+        iniciarCuentaRegresiva();
+      };
+      utterance.onerror = () => {
+        setIdNarrando(null);
+        iniciarCuentaRegresiva();
+      };
+
+      window.speechSynthesis.speak(utterance);
     }
 
-    window.speechSynthesis.cancel();
-    setIdNarrando(ultimo.id);
-    setRangoNarrado([0, 0]);
+    async function narrarConElevenLabs() {
+      try {
+        const audioBlob = await apiVoz.hablar(ultimo.contenido);
+        if (cancelado) return;
 
-    const utterance = new SpeechSynthesisUtterance(ultimo.contenido);
-    utterance.lang = 'es-AR';
-    utterance.rate = 0.95;
-    utterance.onboundary = (evento) => {
-      const inicio = evento.charIndex ?? 0;
-      let fin = ultimo.contenido.indexOf(' ', inicio);
-      if (fin === -1) fin = ultimo.contenido.length;
-      setRangoNarrado([inicio, fin]);
-    };
-    utterance.onend = () => {
-      setIdNarrando(null);
-      iniciarCuentaRegresiva();
-    };
-    utterance.onerror = () => {
-      setIdNarrando(null);
-      iniciarCuentaRegresiva();
-    };
+        const url = URL.createObjectURL(audioBlob);
+        const audio = new Audio(url);
+        audioNarracionRef.current = audio;
+        setIdNarrando(ultimo.id);
+        setRangoNarrado([0, 0]);
 
-    window.speechSynthesis.speak(utterance);
+        // No hay eventos de "palabra actual" en un <audio>, así que se
+        // estima la posición según el tiempo transcurrido sobre el total.
+        audio.ontimeupdate = () => {
+          if (!audio.duration) return;
+          const fraccion = audio.currentTime / audio.duration;
+          const centro = Math.min(
+            ultimo.contenido.length - 1,
+            Math.floor(fraccion * ultimo.contenido.length)
+          );
+          let inicio = ultimo.contenido.lastIndexOf(' ', centro);
+          inicio = inicio === -1 ? 0 : inicio + 1;
+          let fin = ultimo.contenido.indexOf(' ', centro);
+          if (fin === -1) fin = ultimo.contenido.length;
+          setRangoNarrado([inicio, fin]);
+        };
+        audio.onended = () => {
+          URL.revokeObjectURL(url);
+          audioNarracionRef.current = null;
+          setIdNarrando(null);
+          iniciarCuentaRegresiva();
+        };
+        audio.onerror = () => {
+          URL.revokeObjectURL(url);
+          audioNarracionRef.current = null;
+          if (!cancelado) narrarConNavegador();
+        };
+
+        await audio.play();
+      } catch {
+        if (!cancelado) narrarConNavegador();
+      }
+    }
+
+    narrarConElevenLabs();
 
     return () => {
-      window.speechSynthesis.cancel();
+      cancelado = true;
+      if (audioNarracionRef.current) {
+        audioNarracionRef.current.pause();
+        audioNarracionRef.current = null;
+      }
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mensajes, terminada, finalizando]);
 
-  // Limpieza al salir de la pantalla: no dejar la síntesis de voz ni la
+  // Limpieza al salir de la pantalla: no dejar audio, síntesis de voz ni
   // cuenta regresiva corriendo de fondo.
   useEffect(() => {
     return () => {
+      if (audioNarracionRef.current) {
+        audioNarracionRef.current.pause();
+        audioNarracionRef.current = null;
+      }
       if (typeof window !== 'undefined' && window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
@@ -159,6 +225,10 @@ function Entrevista() {
 
     // Si el usuario ya contestó, no hace falta seguir leyendo la pregunta
     // ni arrancar la grabación sola.
+    if (audioNarracionRef.current) {
+      audioNarracionRef.current.pause();
+      audioNarracionRef.current = null;
+    }
     if (typeof window !== 'undefined' && window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }

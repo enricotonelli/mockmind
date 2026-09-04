@@ -1,8 +1,13 @@
 import { generarAudioDesdeTexto } from '@/lib/services';
-import { respuestaError } from '@/lib/auth';
+import { middleware401, respuestaError } from '@/lib/auth';
+
+export const maxDuration = 30;
 
 export async function POST(request) {
   try {
+    const auth = await middleware401(request);
+    if (auth.error) return auth;
+
     const { texto } = await request.json();
 
     if (!texto) {

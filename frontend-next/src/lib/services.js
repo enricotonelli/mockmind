@@ -169,20 +169,46 @@ function calcularPuntajeGeneral(dimensiones) {
 
 export { calcularPuntajeGeneral };
 
-// ===== VOZ (Web Speech API — gratis, corre en el navegador) =====
+// ===== VOZ =====
 
-// Nota: STT y TTS usan Web Speech API del navegador (100% gratis)
-// No requieren backend, se ejecutan en el cliente
-// Ver: src/components/PanelRespuestaConVoz.jsx
-
+// STT sigue en el cliente con Web Speech API (100% gratis, ver EntradaVoz.jsx).
 export async function transcribirAudio(audioBuffer) {
-  // STT se maneja en el cliente con Web Speech API
-  // Este es un placeholder por si se necesita en el futuro
   throw new Error('STT debe usarse con Web Speech API en el cliente, no en el servidor');
 }
 
+// TTS usa ElevenLabs (voz humana, no la sintética del navegador). Tiene un
+// free tier de 10.000 caracteres/mes — si se agota o falla, el cliente
+// (PanelRespuestaConVoz / entrevista/[id]/page.jsx) cae solo a la voz del
+// navegador (Web Speech API) para no dejar la entrevista muda.
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
+const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || '21m00Tcm4TlvDq8ikWAM';
+
 export async function generarAudioDesdeTexto(texto) {
-  // TTS se maneja en el cliente con Web Speech API
-  // Este es un placeholder por si se necesita en el futuro
-  throw new Error('TTS debe usarse con Web Speech API en el cliente, no en el servidor');
+  if (!ELEVENLABS_API_KEY) {
+    throw new Error('ElevenLabs no está configurado (falta ELEVENLABS_API_KEY)');
+  }
+
+  const respuesta = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`,
+    {
+      method: 'POST',
+      headers: {
+        'xi-api-key': ELEVENLABS_API_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text: texto,
+        model_id: 'eleven_multilingual_v2',
+        voice_settings: { stability: 0.5, similarity_boost: 0.75 },
+      }),
+    }
+  );
+
+  if (!respuesta.ok) {
+    const detalle = await respuesta.text().catch(() => '');
+    throw new Error(`ElevenLabs respondió ${respuesta.status}: ${detalle.slice(0, 200)}`);
+  }
+
+  const audioBuffer = await respuesta.arrayBuffer();
+  return Buffer.from(audioBuffer);
 }

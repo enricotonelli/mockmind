@@ -1,12 +1,14 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { voz as apiVoz } from '../api';
 import Boton from './Boton';
 import EntradaVoz from './EntradaVoz';
 
-// Panel de respuesta que integra entrada de voz y texto. STT y TTS corren
-// 100% en el navegador con la Web Speech API (gratis, sin backend) — ver
-// EntradaVoz.jsx para la grabación y hablar() acá abajo para la lectura.
+// Panel de respuesta que integra entrada de voz y texto. STT sigue en el
+// navegador con Web Speech API (EntradaVoz.jsx). TTS usa ElevenLabs (voz
+// humana) vía backend, con fallback automático a la voz sintética del
+// navegador si falla o se agota la cuota gratuita.
 //
 // La voz es el modo por defecto: la entrevista se piensa como una
 // conversación hablada primero, con la opción de escribir como alternativa.
@@ -20,6 +22,7 @@ export default function PanelRespuestaConVoz({
   cuentaRegresiva = null,
 }) {
   const textareaRef = useRef(null);
+  const audioRef = useRef(null);
   const [modo, setModo] = useState('voz'); // 'voz' | 'texto' | 'revision'
   const [hablando, setHablando] = useState(false);
   const [error, setError] = useState('');
@@ -47,30 +50,58 @@ export default function PanelRespuestaConVoz({
     setModo('revision');
   }
 
-  function hablar() {
-    if (!respuestaTexto.trim()) {
-      setError('Escribí algo para escuchar');
-      return;
-    }
+  function hablarConNavegador(texto) {
     if (typeof window === 'undefined' || !window.speechSynthesis) {
       setError('Tu navegador no soporta síntesis de voz.');
+      setHablando(false);
       return;
     }
-
-    setError('');
     window.speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(respuestaTexto);
+    const utterance = new SpeechSynthesisUtterance(texto);
     utterance.lang = 'es-AR';
     utterance.rate = 0.95;
     utterance.onstart = () => setHablando(true);
     utterance.onend = () => setHablando(false);
     utterance.onerror = () => setHablando(false);
-
     window.speechSynthesis.speak(utterance);
   }
 
+  async function hablar() {
+    const texto = respuestaTexto.trim();
+    if (!texto) {
+      setError('Escribí algo para escuchar');
+      return;
+    }
+
+    setError('');
+    setHablando(true);
+
+    try {
+      const audioBlob = await apiVoz.hablar(texto);
+      const url = URL.createObjectURL(audioBlob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.onended = () => {
+        setHablando(false);
+        URL.revokeObjectURL(url);
+      };
+      audio.onerror = () => {
+        setHablando(false);
+        URL.revokeObjectURL(url);
+      };
+      await audio.play();
+    } catch {
+      // Sin cuota de ElevenLabs, sin conexión, etc: se cae a la voz del
+      // navegador para no dejar al usuario sin nada.
+      hablarConNavegador(texto);
+    }
+  }
+
   function detenerHabla() {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
     if (typeof window !== 'undefined' && window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
