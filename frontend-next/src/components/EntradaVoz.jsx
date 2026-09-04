@@ -133,8 +133,23 @@ export default function EntradaVoz({
       <div className="flex items-center gap-3">
         {grabando ? (
           <>
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-acento animate-pulse">
-              <div className="h-3 w-3 rounded-full bg-acento-texto"></div>
+            <div className="orbe-respirar relative flex h-12 w-12 shrink-0 items-center justify-center">
+              <div
+                className="orbe-brillar absolute inset-[-4px] rounded-full blur-md"
+                style={{
+                  background:
+                    'conic-gradient(from 0deg, var(--color-acento), var(--color-exito), var(--color-alerta), var(--color-acento))',
+                }}
+              />
+              <div
+                className="orbe-girar absolute inset-0 rounded-full opacity-90"
+                style={{
+                  background:
+                    'conic-gradient(from 0deg, var(--color-acento), var(--color-exito), var(--color-alerta), var(--color-acento))',
+                }}
+              />
+              <div className="absolute inset-[3px] rounded-full bg-fondo" />
+              <div className="relative h-2 w-2 rounded-full bg-acento" />
             </div>
             <div className="flex-1">
               <div className="text-sm font-medium text-texto">Escuchando...</div>

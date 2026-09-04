@@ -9,6 +9,7 @@ import Boton from '../../components/Boton';
 import Tarjeta from '../../components/Tarjeta';
 import TarjetaSesion from '../../components/TarjetaSesion';
 import EstadoVacio from '../../components/EstadoVacio';
+import DialogoConfirmar from '../../components/DialogoConfirmar';
 
 function saludo() {
   const hora = new Date().getHours();
@@ -37,6 +38,8 @@ function Dashboard() {
   const [resumen, setResumen] = useState(null);
   const [enCurso, setEnCurso] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [porEliminar, setPorEliminar] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     let vigente = true;
@@ -59,6 +62,17 @@ function Dashboard() {
   // Si el pedido de resumen falló (ej: sesión inválida), resumen queda en
   // null: se trata igual que "sin sesiones" en vez de romper el render.
   const sinSesiones = !cargando && (!resumen || resumen.cantidadSesiones === 0);
+
+  async function confirmarEliminarEnCurso() {
+    setEliminando(true);
+    try {
+      await apiSesiones.eliminarSesion(porEliminar.id);
+      setEnCurso((previas) => previas.filter((s) => s.id !== porEliminar.id));
+      setPorEliminar(null);
+    } finally {
+      setEliminando(false);
+    }
+  }
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12">
@@ -94,13 +108,20 @@ function Dashboard() {
                         }`}
                   </p>
                 </div>
-                <Boton
-                  variante="secundario"
-                  onClick={() => router.push(`/entrevista/${sesion.id}`)}
-                  className="shrink-0"
-                >
-                  Retomar
-                </Boton>
+                <div className="flex shrink-0 gap-2">
+                  <Boton
+                    variante="fantasma"
+                    onClick={() => setPorEliminar(sesion)}
+                  >
+                    Eliminar
+                  </Boton>
+                  <Boton
+                    variante="secundario"
+                    onClick={() => router.push(`/entrevista/${sesion.id}`)}
+                  >
+                    Retomar
+                  </Boton>
+                </div>
               </div>
             </Tarjeta>
           ))}
@@ -197,6 +218,20 @@ function Dashboard() {
           </div>
         </section>
       )}
+
+      <DialogoConfirmar
+        abierto={Boolean(porEliminar)}
+        titulo="¿Eliminar esta entrevista sin terminar?"
+        descripcion={
+          porEliminar
+            ? `Se va a borrar la conversación de "${porEliminar.puestoAplicado}". Esta acción no se puede deshacer.`
+            : ''
+        }
+        textoConfirmar="Eliminar"
+        procesando={eliminando}
+        onConfirmar={confirmarEliminarEnCurso}
+        onCancelar={() => setPorEliminar(null)}
+      />
     </div>
   );
 }

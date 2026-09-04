@@ -81,6 +81,11 @@ export default function PanelRespuestaConVoz({
     const texto = respuestaTexto.trim();
     if (texto && !enProceso && !deshabilitado) {
       onResponder(texto);
+      // Vuelve al modo voz para la próxima pregunta, sea cual sea el modo
+      // que se usó para responder esta (si no, EntradaVoz queda
+      // desmontada y ni la cuenta regresiva ni la grabación automática
+      // funcionan a partir de la segunda pregunta).
+      setModo('voz');
     }
   }
 
