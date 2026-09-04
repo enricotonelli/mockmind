@@ -12,7 +12,7 @@ import {
 } from '../prompts/entrevistador';
 import { promptReporte, esquemaReporte } from '../prompts/reporte';
 
-const MODELO_ENTREVISTA = process.env.GOOGLE_GENERATIVE_AI_MODEL || 'gemini-3.6-flash';
+const MODELO_ENTREVISTA = process.env.GOOGLE_GENERATIVE_AI_MODEL || 'gemini-3.1-flash-lite';
 const modeloEntrevistadorAI = google(MODELO_ENTREVISTA);
 
 // ===== AUTENTICACIÓN =====
