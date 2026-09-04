@@ -9,6 +9,10 @@ export async function GET(request) {
     const sesiones = await prisma.sesion.findMany({
       where: { idUsuario: auth.usuario.id },
       orderBy: { fecha: 'desc' },
+      include: {
+        reporteEntrevista: true,
+        _count: { select: { mensajes: { where: { rol: 'usuario' } } } },
+      },
     });
 
     return respuestaOk({ sesiones });
