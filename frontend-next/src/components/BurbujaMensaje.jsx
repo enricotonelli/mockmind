@@ -2,8 +2,23 @@
 
 // Mensaje del chat. El entrevistador se muestra como texto suelto con avatar
 // (estilo Claude Desktop) y el usuario dentro de una burbuja.
+//
+// narrando + rangoNarrado: mientras el entrevistador está siendo leído en
+// voz alta (ver entrevista/[id]/page.jsx), se resalta la porción de texto
+// que se está diciendo en ese momento, tipo karaoke.
 
-function BurbujaMensaje({ mensaje }) {
+function TextoConResaltado({ texto, rango }) {
+  const [inicio, fin] = rango;
+  return (
+    <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-texto">
+      {texto.slice(0, inicio)}
+      <mark className="rounded bg-acento-suave px-0.5 text-acento">{texto.slice(inicio, fin)}</mark>
+      {texto.slice(fin)}
+    </p>
+  );
+}
+
+function BurbujaMensaje({ mensaje, narrando = false, rangoNarrado = [0, 0] }) {
   const esUsuario = mensaje.rol === 'usuario';
 
   if (esUsuario) {
@@ -21,7 +36,9 @@ function BurbujaMensaje({ mensaje }) {
   return (
     <div className="animar-subir flex gap-3">
       <div
-        className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-acento text-sm font-semibold text-acento-texto"
+        className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-acento text-sm font-semibold text-acento-texto ${
+          narrando ? 'animate-pulse' : ''
+        }`}
         aria-hidden="true"
       >
         M
@@ -33,9 +50,13 @@ function BurbujaMensaje({ mensaje }) {
             Repregunta
           </span>
         )}
-        <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-texto">
-          {mensaje.contenido}
-        </p>
+        {narrando ? (
+          <TextoConResaltado texto={mensaje.contenido} rango={rangoNarrado} />
+        ) : (
+          <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-texto">
+            {mensaje.contenido}
+          </p>
+        )}
       </div>
     </div>
   );

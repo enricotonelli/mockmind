@@ -25,6 +25,16 @@ function Entrevista() {
   const [error, setError] = useState('');
   const [progreso, setProgreso] = useState({ actual: 1, total: TOTAL_PREGUNTAS });
 
+  // Narración automática de la pregunta del entrevistador (Web Speech API,
+  // TTS) con resaltado de texto tipo karaoke, y cuenta regresiva antes de
+  // arrancar solo a grabar la respuesta del usuario.
+  const [idNarrando, setIdNarrando] = useState(null);
+  const [rangoNarrado, setRangoNarrado] = useState([0, 0]);
+  const [cuentaRegresiva, setCuentaRegresiva] = useState(null);
+  const [dispararGrabacion, setDispararGrabacion] = useState(0);
+  const narradosRef = useRef(new Set());
+  const cuentaRegresivaRef = useRef(null);
+
   const finalRef = useRef(null);
   const textareaRef = useRef(null);
 
@@ -59,6 +69,83 @@ function Entrevista() {
     finalRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [mensajes, pensando]);
 
+  // Arranca la cuenta regresiva de 5s y, al llegar a 0, dispara la
+  // grabación automática de la respuesta (EntradaVoz la escucha vía
+  // dispararGrabacion).
+  function iniciarCuentaRegresiva() {
+    if (cuentaRegresivaRef.current) clearInterval(cuentaRegresivaRef.current);
+
+    let restante = 5;
+    setCuentaRegresiva(restante);
+    cuentaRegresivaRef.current = setInterval(() => {
+      restante -= 1;
+      if (restante <= 0) {
+        clearInterval(cuentaRegresivaRef.current);
+        cuentaRegresivaRef.current = null;
+        setCuentaRegresiva(null);
+        setDispararGrabacion((n) => n + 1);
+      } else {
+        setCuentaRegresiva(restante);
+      }
+    }, 1000);
+  }
+
+  // Apenas aparece una pregunta nueva del entrevistador (recién cargada o
+  // recién respondida), la lee en voz alta con resaltado tipo karaoke y,
+  // cuando termina, arranca la cuenta regresiva para grabar solo.
+  useEffect(() => {
+    if (terminada || finalizando || !mensajes.length) return;
+
+    const ultimo = mensajes[mensajes.length - 1];
+    if (ultimo.rol !== 'entrevistador' || narradosRef.current.has(ultimo.id)) return;
+    narradosRef.current.add(ultimo.id);
+
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      iniciarCuentaRegresiva();
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    setIdNarrando(ultimo.id);
+    setRangoNarrado([0, 0]);
+
+    const utterance = new SpeechSynthesisUtterance(ultimo.contenido);
+    utterance.lang = 'es-AR';
+    utterance.rate = 0.95;
+    utterance.onboundary = (evento) => {
+      const inicio = evento.charIndex ?? 0;
+      let fin = ultimo.contenido.indexOf(' ', inicio);
+      if (fin === -1) fin = ultimo.contenido.length;
+      setRangoNarrado([inicio, fin]);
+    };
+    utterance.onend = () => {
+      setIdNarrando(null);
+      iniciarCuentaRegresiva();
+    };
+    utterance.onerror = () => {
+      setIdNarrando(null);
+      iniciarCuentaRegresiva();
+    };
+
+    window.speechSynthesis.speak(utterance);
+
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mensajes, terminada, finalizando]);
+
+  // Limpieza al salir de la pantalla: no dejar la síntesis de voz ni la
+  // cuenta regresiva corriendo de fondo.
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+      if (cuentaRegresivaRef.current) clearInterval(cuentaRegresivaRef.current);
+    };
+  }, []);
+
   // El textarea crece con el contenido, hasta un máximo.
   function ajustarAltura(elemento) {
     if (!elemento) return;
@@ -69,6 +156,18 @@ function Entrevista() {
   async function enviar() {
     const texto = respuesta.trim();
     if (!texto || pensando || terminada) return;
+
+    // Si el usuario ya contestó, no hace falta seguir leyendo la pregunta
+    // ni arrancar la grabación sola.
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    if (cuentaRegresivaRef.current) {
+      clearInterval(cuentaRegresivaRef.current);
+      cuentaRegresivaRef.current = null;
+    }
+    setCuentaRegresiva(null);
+    setIdNarrando(null);
 
     setError('');
     setRespuesta('');
@@ -189,7 +288,12 @@ function Entrevista() {
       <div className="flex-1 overflow-y-auto px-5 py-6 sm:px-8">
         <div className="mx-auto max-w-3xl space-y-6">
           {mensajes.map((mensaje) => (
-            <BurbujaMensaje key={mensaje.id} mensaje={mensaje} />
+            <BurbujaMensaje
+              key={mensaje.id}
+              mensaje={mensaje}
+              narrando={mensaje.id === idNarrando}
+              rangoNarrado={rangoNarrado}
+            />
           ))}
 
           {pensando && <IndicadorEscribiendo />}
@@ -217,6 +321,8 @@ function Entrevista() {
             onResponder={enviar}
             deshabilitado={pensando || terminada || finalizando}
             enProceso={pensando || finalizando}
+            dispararGrabacion={dispararGrabacion}
+            cuentaRegresiva={cuentaRegresiva}
           />
         </div>
       </div>

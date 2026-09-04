@@ -4,18 +4,23 @@ import { useRef, useState } from 'react';
 import Boton from './Boton';
 import EntradaVoz from './EntradaVoz';
 
-// Panel de respuesta que integra entrada de texto y voz. STT y TTS corren
+// Panel de respuesta que integra entrada de voz y texto. STT y TTS corren
 // 100% en el navegador con la Web Speech API (gratis, sin backend) — ver
 // EntradaVoz.jsx para la grabación y hablar() acá abajo para la lectura.
+//
+// La voz es el modo por defecto: la entrevista se piensa como una
+// conversación hablada primero, con la opción de escribir como alternativa.
 export default function PanelRespuestaConVoz({
   respuestaTexto = '',
   onRespuestaTextoChange = () => {},
   onResponder = () => {},
   deshabilitado = false,
   enProceso = false,
+  dispararGrabacion,
+  cuentaRegresiva = null,
 }) {
   const textareaRef = useRef(null);
-  const [modo, setModo] = useState('texto'); // 'texto' | 'voz' | 'revision'
+  const [modo, setModo] = useState('voz'); // 'voz' | 'texto' | 'revision'
   const [hablando, setHablando] = useState(false);
   const [error, setError] = useState('');
 
@@ -81,21 +86,8 @@ export default function PanelRespuestaConVoz({
 
   return (
     <div className="space-y-3">
-      {/* Selector de modo */}
+      {/* Selector de modo: Grabar primero, es la forma principal de responder */}
       <div className="flex gap-2 border-b border-borde">
-        <button
-          onClick={() => {
-            setModo('texto');
-            setError('');
-          }}
-          className={`px-3 py-2 text-sm font-medium transition ${
-            modo === 'texto'
-              ? 'border-b-2 border-acento text-texto'
-              : 'text-texto-suave hover:text-texto'
-          }`}
-        >
-          Escribir
-        </button>
         <button
           onClick={() => {
             setModo('voz');
@@ -109,7 +101,33 @@ export default function PanelRespuestaConVoz({
         >
           Grabar
         </button>
+        <button
+          onClick={() => {
+            setModo('texto');
+            setError('');
+          }}
+          className={`px-3 py-2 text-sm font-medium transition ${
+            modo === 'texto'
+              ? 'border-b-2 border-acento text-texto'
+              : 'text-texto-suave hover:text-texto'
+          }`}
+        >
+          Escribir
+        </button>
       </div>
+
+      {/* Modo de grabación */}
+      {modo === 'voz' && (
+        <div className="rounded-2xl border border-borde bg-superficie p-4">
+          <EntradaVoz
+            onTranscripcion={manejarTranscripcion}
+            deshabilitado={deshabilitado}
+            duracionMaxSegundos={120}
+            dispararGrabacion={dispararGrabacion}
+            cuentaRegresiva={cuentaRegresiva}
+          />
+        </div>
+      )}
 
       {/* Modo de escritura */}
       {modo === 'texto' && (
@@ -148,17 +166,6 @@ export default function PanelRespuestaConVoz({
               </Boton>
             )}
           </div>
-        </div>
-      )}
-
-      {/* Modo de grabación */}
-      {modo === 'voz' && (
-        <div className="rounded-2xl border border-borde bg-superficie p-4">
-          <EntradaVoz
-            onTranscripcion={manejarTranscripcion}
-            deshabilitado={deshabilitado}
-            duracionMaxSegundos={120}
-          />
         </div>
       )}
 

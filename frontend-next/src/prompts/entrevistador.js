@@ -70,10 +70,15 @@ function promptTurno({
     instruccionRepregunta = `Ya le hiciste ${repreguntasSeguidas} repreguntas seguidas sobre esta pregunta. NO repreguntes de nuevo aunque la respuesta siga floja: tenés que avanzar.`;
   } else {
     instruccionRepregunta =
-      'Evaluá la respuesta que acaba de dar. Si es vaga, muy corta, no da ningún ejemplo concreto, ' +
-      'o no cuenta el resultado de lo que hizo, repreguntale de forma natural pidiendo que ' +
-      'profundice ese punto puntual (no repitas la pregunta original con otras palabras). ' +
-      'Si la respuesta ya está completa, avanzá.';
+      'Evaluá la respuesta que acaba de dar. Si la respuesta no tiene NADA que ver con lo que ' +
+      'preguntaste (está totalmente fuera de tema, te saluda como si nada, dice algo random, un ' +
+      'chiste, o cualquier cosa que ni intenta responder la pregunta), no le sigas la corriente ni ' +
+      'te pongas a charlar de lo que dijo: marcalo en una frase corta, con el tono que te ' +
+      'corresponde (cordial si es RRHH, directo si es de estrés, etc.), y repetí o reformulá la ' +
+      'pregunta original para que la responda de verdad. Si en cambio la respuesta es vaga, muy ' +
+      'corta, no da ningún ejemplo concreto, o no cuenta el resultado de lo que hizo, repreguntale ' +
+      'de forma natural pidiendo que profundice ese punto puntual (no repitas la pregunta original ' +
+      'con otras palabras). Si la respuesta ya está completa, avanzá.';
   }
 
   const instruccionAvanzar = esUltimaPregunta

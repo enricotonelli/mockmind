@@ -6,10 +6,22 @@ import Boton from './Boton';
 // Captura la respuesta hablada con la Web Speech API del navegador (STT
 // nativo, gratis) y emite el texto transcripto por onTranscripcion. No graba
 // ni sube ningún archivo de audio — todo pasa en el cliente.
-export default function EntradaVoz({ onTranscripcion, deshabilitado = false, duracionMaxSegundos = 60 }) {
+//
+// dispararGrabacion: cada vez que este valor cambia, arranca la grabación
+// sola (usado para empezar a escuchar automáticamente apenas termina de
+// preguntar el entrevistador). cuentaRegresiva: si no es null, muestra la
+// cuenta regresiva antes de ese arranque automático.
+export default function EntradaVoz({
+  onTranscripcion,
+  deshabilitado = false,
+  duracionMaxSegundos = 60,
+  dispararGrabacion,
+  cuentaRegresiva = null,
+}) {
   const reconocimientoRef = useRef(null);
   const transcriptRef = useRef('');
   const timerRef = useRef(null);
+  const dispararAnteriorRef = useRef(dispararGrabacion);
   const [grabando, setGrabando] = useState(false);
   const [tiempoTranscurrido, setTiempoTranscurrido] = useState(0);
   const [error, setError] = useState('');
@@ -53,6 +65,13 @@ export default function EntradaVoz({ onTranscripcion, deshabilitado = false, dur
       // 'no-speech' salta seguido cuando hay un silencio breve; no cortar la
       // grabación por eso, solo cuando es un error real (mic denegado, etc).
       if (evento.error === 'no-speech') return;
+      // Un arranque automático puede fallar si todavía no se concedió el
+      // permiso del micrófono — no es un error real para mostrarle al
+      // usuario, simplemente no se pudo empezar sola.
+      if (evento.error === 'not-allowed' && dispararGrabacion !== undefined) {
+        detenerGrabacion();
+        return;
+      }
       setError('Error al reconocer la voz: ' + evento.error);
       detenerGrabacion();
     };
@@ -82,6 +101,19 @@ export default function EntradaVoz({ onTranscripcion, deshabilitado = false, dur
       reconocimientoRef.current.stop();
     }
   }
+
+  // Arranca solo cuando el padre pide una nueva grabación automática (por
+  // ejemplo, apenas termina de sonar la pregunta del entrevistador).
+  useEffect(() => {
+    if (dispararGrabacion === undefined) return;
+    if (dispararGrabacion === dispararAnteriorRef.current) return;
+    dispararAnteriorRef.current = dispararGrabacion;
+
+    if (!deshabilitado && !grabando && soportado) {
+      iniciarGrabacion();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispararGrabacion]);
 
   const porcentajeUsado = (tiempoTranscurrido / duracionMaxSegundos) * 100;
 
@@ -123,6 +155,19 @@ export default function EntradaVoz({ onTranscripcion, deshabilitado = false, dur
               Detener
             </Boton>
           </>
+        ) : cuentaRegresiva != null ? (
+          <div className="flex w-full items-center gap-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-acento text-sm font-semibold text-acento">
+              {cuentaRegresiva}
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-texto">Preparate para responder…</p>
+              <p className="text-xs text-texto-suave">Empezamos a grabar en {cuentaRegresiva}s</p>
+            </div>
+            <Boton onClick={iniciarGrabacion} disabled={deshabilitado} variante="secundario" tamano="pequeño">
+              Empezar ya
+            </Boton>
+          </div>
         ) : (
           <Boton
             onClick={iniciarGrabacion}
