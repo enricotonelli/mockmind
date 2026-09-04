@@ -1,13 +1,12 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { voz as apiVoz } from '../api';
 import Boton from './Boton';
 import EntradaVoz from './EntradaVoz';
-import ReproductorAudio from './ReproductorAudio';
 
-// Panel de respuesta que integra entrada de texto y voz
-// onResponder: callback que recibe el texto de la respuesta
+// Panel de respuesta que integra entrada de texto y voz. STT y TTS corren
+// 100% en el navegador con la Web Speech API (gratis, sin backend) — ver
+// EntradaVoz.jsx para la grabación y hablar() acá abajo para la lectura.
 export default function PanelRespuestaConVoz({
   respuestaTexto = '',
   onRespuestaTextoChange = () => {},
@@ -16,11 +15,8 @@ export default function PanelRespuestaConVoz({
   enProceso = false,
 }) {
   const textareaRef = useRef(null);
-  const [modo, setModo] = useState('texto'); // 'texto' o 'voz'
-  const [audioGrabado, setAudioGrabado] = useState(null);
-  const [transcribiendo, setTranscribiendo] = useState(false);
-  const [audioGenerado, setAudioGenerado] = useState(null);
-  const [generandoAudio, setGenerandoAudio] = useState(false);
+  const [modo, setModo] = useState('texto'); // 'texto' | 'voz' | 'revision'
+  const [hablando, setHablando] = useState(false);
   const [error, setError] = useState('');
 
   function ajustarAltura(elemento) {
@@ -36,46 +32,44 @@ export default function PanelRespuestaConVoz({
     }
   }
 
-  async function manejarAudioGrabado(audioBlob) {
-    try {
-      setError('');
-      setTranscribiendo(true);
-      setAudioGrabado(audioBlob);
-
-      // Transcribir el audio
-      const texto = await apiVoz.transcribir(audioBlob);
-
-      // Actualizar el campo de texto con la transcripción
-      onRespuestaTextoChange(texto);
-
-      // Cambiar a modo de revisión
-      setModo('revision');
-    } catch (err) {
-      setError('Error al transcribir el audio: ' + err.message);
-      setAudioGrabado(null);
-    } finally {
-      setTranscribiendo(false);
+  function manejarTranscripcion(texto) {
+    if (!texto || !texto.trim()) {
+      setError('No se detectó ninguna voz. Probá de nuevo.');
+      return;
     }
+    setError('');
+    onRespuestaTextoChange(texto);
+    setModo('revision');
   }
 
-  async function generarAudio() {
+  function hablar() {
     if (!respuestaTexto.trim()) {
-      setError('Escribí algo para generar audio');
+      setError('Escribí algo para escuchar');
+      return;
+    }
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      setError('Tu navegador no soporta síntesis de voz.');
       return;
     }
 
-    try {
-      setError('');
-      setGenerandoAudio(true);
+    setError('');
+    window.speechSynthesis.cancel();
 
-      // Generar audio desde el texto
-      const audioBlob = await apiVoz.hablar(respuestaTexto);
-      setAudioGenerado(audioBlob);
-    } catch (err) {
-      setError('Error al generar audio: ' + err.message);
-    } finally {
-      setGenerandoAudio(false);
+    const utterance = new SpeechSynthesisUtterance(respuestaTexto);
+    utterance.lang = 'es-AR';
+    utterance.rate = 0.95;
+    utterance.onstart = () => setHablando(true);
+    utterance.onend = () => setHablando(false);
+    utterance.onerror = () => setHablando(false);
+
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function detenerHabla() {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
     }
+    setHablando(false);
   }
 
   function enviar() {
@@ -108,7 +102,7 @@ export default function PanelRespuestaConVoz({
             setError('');
           }}
           className={`px-3 py-2 text-sm font-medium transition ${
-            modo === 'voz'
+            modo === 'voz' || modo === 'revision'
               ? 'border-b-2 border-acento text-texto'
               : 'text-texto-suave hover:text-texto'
           }`}
@@ -145,13 +139,12 @@ export default function PanelRespuestaConVoz({
 
             {respuestaTexto.trim() && (
               <Boton
-                onClick={generarAudio}
+                onClick={hablando ? detenerHabla : hablar}
                 variante="secundario"
                 tamano="pequeño"
-                disabled={deshabilitado || generandoAudio}
-                cargando={generandoAudio}
+                disabled={deshabilitado}
               >
-                {generandoAudio ? 'Generando audio…' : 'Escuchar'}
+                {hablando ? 'Detener' : 'Escuchar'}
               </Boton>
             )}
           </div>
@@ -159,11 +152,11 @@ export default function PanelRespuestaConVoz({
       )}
 
       {/* Modo de grabación */}
-      {modo === 'voz' && modo !== 'revision' && (
+      {modo === 'voz' && (
         <div className="rounded-2xl border border-borde bg-superficie p-4">
           <EntradaVoz
-            onAudioRecordado={manejarAudioGrabado}
-            deshabilitado={deshabilitado || transcribiendo}
+            onTranscripcion={manejarTranscripcion}
+            deshabilitado={deshabilitado}
             duracionMaxSegundos={120}
           />
         </div>
@@ -173,39 +166,17 @@ export default function PanelRespuestaConVoz({
       {modo === 'revision' && (
         <div className="space-y-3 rounded-2xl border border-borde bg-superficie p-4">
           <div>
-            <p className="text-sm font-medium text-texto mb-2">Tu respuesta grabada:</p>
-            {audioGrabado && (
-              <ReproductorAudio
-                audio={audioGrabado}
-                titulo="Audio grabado"
-                deshabilitado={deshabilitado}
-              />
-            )}
-          </div>
-
-          <div>
             <p className="text-sm font-medium text-texto mb-2">Transcripción (editable):</p>
             <div className="rounded-lg bg-superficie-alt border border-borde p-3">
               <textarea
                 value={respuestaTexto}
                 onChange={(e) => onRespuestaTextoChange(e.target.value)}
-                disabled={deshabilitado || transcribiendo}
+                disabled={deshabilitado}
                 className="w-full resize-none bg-transparent text-sm leading-relaxed text-texto placeholder:text-texto-tenue focus:outline-none disabled:opacity-50"
                 rows={3}
               />
             </div>
           </div>
-
-          {audioGenerado && (
-            <div>
-              <p className="text-sm font-medium text-texto mb-2">Vista previa de audio:</p>
-              <ReproductorAudio
-                audio={audioGenerado}
-                titulo="Preview de tu respuesta"
-                deshabilitado={deshabilitado}
-              />
-            </div>
-          )}
 
           <div className="flex flex-wrap gap-2">
             <Boton
@@ -215,23 +186,18 @@ export default function PanelRespuestaConVoz({
               Enviar respuesta
             </Boton>
 
-            {!audioGenerado && (
-              <Boton
-                onClick={generarAudio}
-                variante="secundario"
-                disabled={deshabilitado || generandoAudio}
-                cargando={generandoAudio}
-              >
-                {generandoAudio ? 'Generando audio…' : 'Generar audio'}
-              </Boton>
-            )}
+            <Boton
+              onClick={hablando ? detenerHabla : hablar}
+              variante="secundario"
+              disabled={deshabilitado || !respuestaTexto.trim()}
+            >
+              {hablando ? 'Detener' : 'Escuchar'}
+            </Boton>
 
             <Boton
               onClick={() => {
                 setModo('voz');
-                setAudioGrabado(null);
-                setAudioGenerado(null);
-                setRespuestaTexto('');
+                onRespuestaTextoChange('');
               }}
               variante="secundario"
               disabled={deshabilitado}
@@ -240,15 +206,6 @@ export default function PanelRespuestaConVoz({
             </Boton>
           </div>
         </div>
-      )}
-
-      {/* Mostrar audio generado en modo texto */}
-      {modo === 'texto' && audioGenerado && (
-        <ReproductorAudio
-          audio={audioGenerado}
-          titulo="Audio generado de tu respuesta"
-          deshabilitado={deshabilitado}
-        />
       )}
 
       {/* Mostrar errores */}
