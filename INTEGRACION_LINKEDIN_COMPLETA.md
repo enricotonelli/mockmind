@@ -104,11 +104,11 @@ Vercel hará deploy automático.
 
 ---
 
-## 🔐 Credenciales (YA CONFIGURADAS)
+## 🔐 Credenciales (YA CONFIGURADAS EN VERCEL)
 
 ```
 Client ID:     77gz1f8clxm7nq
-Client Secret: WPL_AP1.H2abVPPPepHQMZHc.KAmm6w==
+Client Secret: [Configurado en Vercel env vars]
 App Name:      Mockmind
 Status:        Active en LinkedIn Developer
 ```

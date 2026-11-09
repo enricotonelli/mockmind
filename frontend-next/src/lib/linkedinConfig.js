@@ -3,8 +3,8 @@
  */
 
 export const linkedinConfig = {
-  clientID: process.env.LINKEDIN_CLIENT_ID || '77gz1f8clxm7nq',
-  clientSecret: process.env.LINKEDIN_CLIENT_SECRET || 'WPL_AP1.H2abVPPPepHQMZHc.KAmm6w==',
+  clientID: process.env.LINKEDIN_CLIENT_ID,
+  clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
   callbackURL: process.env.NODE_ENV === 'production'
     ? 'https://mockmind-nine.vercel.app/api/auth/linkedin/callback'
     : 'http://localhost:3000/api/auth/linkedin/callback',
