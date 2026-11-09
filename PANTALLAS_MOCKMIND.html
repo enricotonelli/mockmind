@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MockMind - Pantallas del Sistema</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #a0aec0;
+            margin-bottom: 20px;
+        }
+
+        .info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 30px;
+        }
+
+        .info p {
+            margin: 8px 0;
+            color: #cbd5e0;
+        }
+
+        .pantalla {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        .pantalla h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .numero {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .descripcion {
+            color: #cbd5e0;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #764ba2;
+        }
+
+        .screenshot {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            margin: 20px auto;
+            display: block;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .caracteristicas {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .caracteristicas h4 {
+            color: #a0aec0;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .caracteristicas ul {
+            list-style: none;
+            color: #cbd5e0;
+        }
+
+        .caracteristicas li {
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .caracteristicas li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            border-top: 1px solid rgba(102, 126, 234, 0.2);
+            color: #a0aec0;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MockMind</h1>
+            <p class="subtitle">Entrenador de Entrevistas Laborales con IA</p>
+            <div class="info">
+                <p><strong>Proyecto Final de Ingeniería en Informática</strong></p>
+                <p>Universidad del Salvador (USAL) - Facultad de Ingeniería</p>
+                <p>Alumno: Enrico Tonelli | Profesor: Ing. Esteban Tissera MBA</p>
+            </div>
+        </header>
+
+        <!-- PANTALLA 1: LOGIN -->
+        <div class="pantalla">
+            <h2><span class="numero">1</span> Pantalla de Login</h2>
+            <span class="badge">Autenticación</span>
+            <div class="descripcion">
+                Formulario de inicio de sesión con validación de credenciales. Los usuarios ingresan su email y contraseña para acceder a la plataforma.
+            </div>
+            <img src="/Users/administrador/.claude/projects/-Users-administrador-Desktop-Mockmind/c9e50281-d90b-4bf5-8f0e-d586ee3d6de1/tool-results/mcp-Claude_Browser-blob-1792414603936-xddmtz.jpg" alt="Pantalla de Login" class="screenshot">
+            <div class="caracteristicas">
+                <h4>Características:</h4>
+                <ul>
+                    <li>Campo de email con validación</li>
+                    <li>Campo de contraseña seguro</li>
+                    <li>Botón de entrada</li>
+                    <li>Enlace para registro de nuevos usuarios</li>
+                    <li>Información sobre MockMind en el lado izquierdo</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PANTALLA 2: DASHBOARD -->
+        <div class="pantalla">
+            <h2><span class="numero">2</span> Dashboard Principal</h2>
+            <span class="badge">Inicio</span>
+            <div class="descripcion">
+                Panel de control principal donde el usuario visualiza sus entrevistas en progreso, opción para crear una nueva entrevista y estadísticas generales de desempeño.
+            </div>
+            <img src="/Users/administrador/.claude/projects/-Users-administrador-Desktop-Mockmind/c9e50281-d90b-4bf5-8f0e-d586ee3d6de1/tool-results/mcp-Claude_Browser-blob-1792414616990-xiknzx.jpg" alt="Dashboard Principal" class="screenshot">
+            <div class="caracteristicas">
+                <h4>Características:</h4>
+                <ul>
+                    <li>Saludo personalizado al usuario</li>
+                    <li>Entrevistas en curso con botones Retomar/Eliminar</li>
+                    <li>Opción para comenzar nueva entrevista</li>
+                    <li>Estadísticas: entrevistas completadas, puntaje promedio, punto más fuerte</li>
+                    <li>Navegación lateral con links a Historial, CV y Perfil</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PANTALLA 3: CREAR ENTREVISTA PASO 1 -->
+        <div class="pantalla">
+            <h2><span class="numero">3</span> Configuración - Paso 1: El Puesto</h2>
+            <span class="badge">Configuración</span>
+            <div class="descripcion">
+                Primer paso del asistente de creación de entrevista. El usuario carga la descripción del puesto al que desea aplicar, que será utilizada por la IA para generar preguntas específicas.
+            </div>
+            <img src="/Users/administrador/.claude/projects/-Users-administrador-Desktop-Mockmind/c9e50281-d90b-4bf5-8f0e-d586ee3d6de1/tool-results/mcp-Claude_Browser-blob-1792414629681-8o1y7p.jpg" alt="Crear Entrevista Paso 1" class="screenshot">
+            <div class="caracteristicas">
+                <h4>Características:</h4>
+                <ul>
+                    <li>Campo de texto para pegar la descripción del puesto</li>
+                    <li>Contador de caracteres mínimos requeridos</li>
+                    <li>Botones de sugerencias rápidas (Desarrollador, Analista, Atención al Cliente)</li>
+                    <li>Indicador de progreso del asistente</li>
+                    <li>Botón Continuar para pasar al siguiente paso</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PANTALLA 4: CREAR ENTREVISTA PASO 2 -->
+        <div class="pantalla">
+            <h2><span class="numero">4</span> Configuración - Paso 2: Tipo de Entrevista y Duración</h2>
+            <span class="badge">Configuración</span>
+            <div class="descripcion">
+                Segundo paso donde el usuario selecciona el tipo de entrevista (RRHH, Técnica o Estrés) y la duración deseada (Corta, Completa o Extendida). Estas opciones determinan el estilo y alcance de las preguntas.
+            </div>
+            <img src="/Users/administrador/.claude/projects/-Users-administrador-Desktop-Mockmind/c9e50281-d90b-4bf5-8f0e-d586ee3d6de1/tool-results/mcp-Claude_Browser-blob-1792414663013-okxan4.jpg" alt="Crear Entrevista Paso 2" class="screenshot">
+            <div class="caracteristicas">
+                <h4>Características:</h4>
+                <ul>
+                    <li>Selección de tipo de entrevista: Recursos Humanos, Técnica, Estrés</li>
+                    <li>Descripción de cada tipo de entrevista</li>
+                    <li>Opciones de duración: Corta (4 preguntas), Completa (6 preguntas), Extendida (8+ preguntas)</li>
+                    <li>Indicador de progreso del asistente</li>
+                    <li>Botones Volver y Comenzar entrevista</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PANTALLA 5: ENTREVISTA EN PROGRESO -->
+        <div class="pantalla">
+            <h2><span class="numero">5</span> Entrevista en Progreso</h2>
+            <span class="badge">Entrevista</span>
+            <div class="descripcion">
+                Interfaz principal de la entrevista. Muestra las preguntas del entrevistador IA y ofrece dos modos de respuesta: Grabar (voz con Web Speech API) o Escribir (texto). Incluye orbe animado estilo Siri durante la grabación y cuenta regresiva de 5 segundos antes de activar automáticamente el micrófono.
+            </div>
+            <img src="/Users/administrador/.claude/projects/-Users-administrador-Desktop-Mockmind/c9e50281-d90b-4bf5-8f0e-d586ee3d6de1/tool-results/mcp-Claude_Browser-blob-1792414685610-3vweyx.jpg" alt="Entrevista en Progreso" class="screenshot">
+            <div class="caracteristicas">
+                <h4>Características:</h4>
+                <ul>
+                    <li>Contador de preguntas (ej: Pregunta 1 de 6)</li>
+                    <li>Pregunta del entrevistador IA con narración automática (TTS con ElevenLabs)</li>
+                    <li>Dos pestañas: Grabar (default) y Escribir</li>
+                    <li>Botón Grabar respuesta con orbe animado (giro, respiración, brillo)</li>
+                    <li>Auto-trigger de grabación después de 5 segundos de la pregunta</li>
+                    <li>Botón Finalizar para terminar la entrevista en cualquier momento</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PANTALLA 6: HISTORIAL -->
+        <div class="pantalla">
+            <h2><span class="numero">6</span> Historial de Entrevistas</h2>
+            <span class="badge">Historial</span>
+            <div class="descripcion">
+                Vista general del historial de entrevistas completadas. Muestra un gráfico de evolución del puntaje en el tiempo, filtros por tipo de entrevista, y una lista de todas las entrevistas completadas con sus puntajes.
+            </div>
+            <img src="/Users/administrador/.claude/projects/-Users-administrador-Desktop-Mockmind/c9e50281-d90b-4bf5-8f0e-d586ee3d6de1/tool-results/mcp-Claude_Browser-blob-1792414696023-bjgad5.jpg" alt="Historial de Entrevistas" class="screenshot">
+            <div class="caracteristicas">
+                <h4>Características:</h4>
+                <ul>
+                    <li>Gráfico de evolución del puntaje con trend line</li>
+                    <li>Filtros por tipo de entrevista: Todas, Recursos Humanos, Técnica, Estrés</li>
+                    <li>Lista de entrevistas completadas ordenadas por fecha</li>
+                    <li>Puntaje total de cada entrevista</li>
+                    <li>Descripción breve del puesto</li>
+                    <li>Botón Eliminar para borrar entrevistas del historial</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PANTALLA 7: REPORTE PARTE 1 -->
+        <div class="pantalla">
+            <h2><span class="numero">7</span> Reporte de Feedback - Análisis Textual</h2>
+            <span class="badge">Reporte</span>
+            <div class="descripcion">
+                Primera parte del reporte de feedback generado por la IA tras completar la entrevista. Contiene un análisis detallado en texto de la entrevista con sugerencias específicas de mejora, basado en las respuestas del usuario.
+            </div>
+            <img src="/Users/administrador/.claude/projects/-Users-administrador-Desktop-Mockmind/c9e50281-d90b-4bf5-8f0e-d586ee3d6de1/tool-results/mcp-Claude_Browser-blob-1792414710352-oq3m16.jpg" alt="Reporte Feedback Parte 1" class="screenshot">
+            <div class="caracteristicas">
+                <h4>Características:</h4>
+                <ul>
+                    <li>Tipo de entrevista y fecha realizada</li>
+                    <li>Título "Reporte de feedback"</li>
+                    <li>Descripción del puesto solicitado</li>
+                    <li>Análisis detallado generado por IA con feedback constructivo</li>
+                    <li>Información sobre fortalezas y áreas de mejora</li>
+                    <li>Botón para volver al historial</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PANTALLA 8: REPORTE PARTE 2 -->
+        <div class="pantalla">
+            <h2><span class="numero">8</span> Reporte de Feedback - Puntajes por Dimensión</h2>
+            <span class="badge">Reporte</span>
+            <div class="descripcion">
+                Segunda parte del reporte mostrando métricas cuantitativas. Incluye puntaje general (0-100), puntaje de cada dimensión evaluada, y descripción de qué se evalúa en cada una.
+            </div>
+            <img src="/Users/administrador/.claude/projects/-Users-administrador-Desktop-Mockmind/c9e50281-d90b-4bf5-8f0e-d586ee3d6de1/tool-results/mcp-Claude_Browser-blob-1792414723643-jjd5k0.jpg" alt="Reporte Feedback Parte 2" class="screenshot">
+            <div class="caracteristicas">
+                <h4>Características:</h4>
+                <ul>
+                    <li>Puntaje general con representación visual circular (0-100)</li>
+                    <li>Claridad expositiva: evalúa comprensibilidad y directividad</li>
+                    <li>Uso del método STAR: verifica Situación, Tarea, Acción, Resultado</li>
+                    <li>Concreción de ejemplos: mide respaldo con casos y datos reales</li>
+                    <li>Coherencia del discurso: valida consistencia entre respuestas</li>
+                    <li>Barras de progreso visuales para cada métrica</li>
+                    <li>Descripciones breves de qué se evalúa en cada dimensión</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PANTALLA 9: PERFIL -->
+        <div class="pantalla">
+            <h2><span class="numero">9</span> Perfil de Usuario</h2>
+            <span class="badge">Perfil</span>
+            <div class="descripcion">
+                Página de perfil del usuario mostrando información personal, estadísticas generales de entrevistas realizadas, puntaje promedio alcanzado y dimensión en la que tiene mejor desempeño.
+            </div>
+            <img src="/Users/administrador/.claude/projects/-Users-administrador-Desktop-Mockmind/c9e50281-d90b-4bf5-8f0e-d586ee3d6de1/tool-results/mcp-Claude_Browser-blob-1792414733923-qgkb4c.jpg" alt="Perfil de Usuario" class="screenshot">
+            <div class="caracteristicas">
+                <h4>Características:</h4>
+                <ul>
+                    <li>Avatar del usuario con iniciales</li>
+                    <li>Nombre completo del usuario</li>
+                    <li>Email asociado a la cuenta</li>
+                    <li>Fecha de registro como miembro</li>
+                    <li>Total de entrevistas completadas</li>
+                    <li>Puntaje promedio acumulado</li>
+                    <li>Punto más fuerte (dimensión con mejor puntaje)</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>MockMind v1.0</strong> - Proyecto Final de Ingeniería en Informática 2026</p>
+            <p>Última actualización: Octubre 2026</p>
+            <p>📍 <a href="https://mockmind-nine.vercel.app" style="color: #667eea; text-decoration: none;">https://mockmind-nine.vercel.app</a></p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,4 @@
+buena: n=5 errores=0 general media=67.6 min=56 max=88 rango=32 (referencia del autor: 90) tiempo reporte medio=0.4s max=0.5s
+regular: n=5 errores=0 general media=30.4 min=30 max=32 rango=2 (referencia del autor: 36) tiempo reporte medio=0.4s max=0.4s
+mala: n=5 errores=0 general media=15.6 min=10 max=22 rango=12 (referencia del autor: 9) tiempo reporte medio=0.4s max=0.5s
+fluida_incorrecta: n=5 errores=0 general media=14.6 min=13 max=15 rango=2 (referencia del autor: 41) tiempo reporte medio=0.4s max=0.4s

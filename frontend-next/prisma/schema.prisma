@@ -14,6 +14,11 @@ model Usuario {
   passwordHash String
   fecha_registro DateTime @default(now())
 
+  // LinkedIn OAuth
+  linkedinId          String?
+  linkedinAccessToken String?
+  linkedinUrl         String?
+
   sesiones Sesion[]
 
   @@map("usuarios")

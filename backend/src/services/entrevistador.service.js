@@ -5,7 +5,7 @@
 // se le pasa explícitamente a cada función: este archivo no guarda nada.
 
 const { generateObject } = require('ai');
-const { modeloEntrevistadorAI } = require('../config/anthropic');
+const { modeloEntrevistadorAI } = require('../config/gemini');
 const { ErrorApi } = require('../middleware/manejoErrores');
 const {
   promptApertura,

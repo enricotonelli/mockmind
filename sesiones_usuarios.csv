@@ -1,0 +1,82 @@
+usuario,sesion,tipo,puesto,fecha,duracion_seg,finalizada,claridad,star,ejemplos,coherencia,repreguntas
+U1,18,Tecnica,Full Stack,2026-10-18 14:28:48.424000,48,True,70.0,75.0,80.0,76.0,2
+U1,17,Tecnica,Full Stack,2026-10-19 14:28:48.424000,50,True,72.0,78.0,82.0,78.0,1
+U1,16,Tecnica,Full Stack,2026-10-20 14:28:48.424000,45,True,75.0,80.0,85.0,80.0,1
+U1,3,Tecnica,"Ingeniero Full Stack Senior - Node.js + React
+Buscamos un ingeniero con 5+ años de experiencia en:
+- Backend: Node.js, Express, PostgreSQL
+- Frontend: React, TypeScript, Tailwind
+- Integraciones API y microservicios
+Requisitos: trabajo en equipo, mentorship, toma de decisiones técnicas.",2026-10-20 15:34:56.177000,,False,,,,,
+U1,6,Tecnica,"Ingeniero Full Stack Senior - Node.js + React
+Buscamos un ingeniero con 5+ años de experiencia en:
+- Backend: Node.js, Express, PostgreSQL
+- Frontend: React, TypeScript, Tailwind
+- Integraciones API y microservicios
+Requisitos: trabajo en equipo, mentorship, toma de decisiones técnicas.",2026-10-20 17:11:58.060000,,False,,,,,
+U1,9,Tecnica,"Ingeniero Full Stack Senior - Node.js + React
+Buscamos un ingeniero con 5+ años de experiencia en:
+- Backend: Node.js, Express, PostgreSQL
+- Frontend: React, TypeScript, Tailwind
+- Integraciones API y microservicios
+Requisitos: trabajo en equipo, mentorship, toma de decisiones técnicas.",2026-10-20 17:21:20.005000,,False,,,,,
+U1,12,Tecnica,"Ingeniero Full Stack Senior - Node.js + React
+Buscamos un ingeniero con 5+ años de experiencia en:
+- Backend: Node.js, Express, PostgreSQL
+- Frontend: React, TypeScript, Tailwind
+- Integraciones API y microservicios
+Requisitos: trabajo en equipo, mentorship, toma de decisiones técnicas.",2026-10-20 17:22:10.340000,,False,,,,,
+U2,21,Tecnica,Node.js,2026-10-18 14:28:48.424000,40,True,60.0,55.0,62.0,59.0,2
+U2,20,Tecnica,Node.js,2026-10-19 14:28:48.424000,38,True,58.0,52.0,60.0,57.0,2
+U2,19,Tecnica,Node.js,2026-10-20 14:28:48.424000,35,True,55.0,50.0,58.0,55.0,3
+U2,4,Tecnica,"Ingeniero Full Stack Senior - Node.js + React
+Buscamos un ingeniero con 5+ años de experiencia en:
+- Backend: Node.js, Express, PostgreSQL
+- Frontend: React, TypeScript, Tailwind
+- Integraciones API y microservicios
+Requisitos: trabajo en equipo, mentorship, toma de decisiones técnicas.",2026-10-20 15:34:56.551000,,False,,,,,
+U2,7,Tecnica,"Ingeniero Full Stack Senior - Node.js + React
+Buscamos un ingeniero con 5+ años de experiencia en:
+- Backend: Node.js, Express, PostgreSQL
+- Frontend: React, TypeScript, Tailwind
+- Integraciones API y microservicios
+Requisitos: trabajo en equipo, mentorship, toma de decisiones técnicas.",2026-10-20 17:11:58.509000,,False,,,,,
+U2,10,Tecnica,"Ingeniero Full Stack Senior - Node.js + React
+Buscamos un ingeniero con 5+ años de experiencia en:
+- Backend: Node.js, Express, PostgreSQL
+- Frontend: React, TypeScript, Tailwind
+- Integraciones API y microservicios
+Requisitos: trabajo en equipo, mentorship, toma de decisiones técnicas.",2026-10-20 17:21:20.070000,,False,,,,,
+U2,13,Tecnica,"Ingeniero Full Stack Senior - Node.js + React
+Buscamos un ingeniero con 5+ años de experiencia en:
+- Backend: Node.js, Express, PostgreSQL
+- Frontend: React, TypeScript, Tailwind
+- Integraciones API y microservicios
+Requisitos: trabajo en equipo, mentorship, toma de decisiones técnicas.",2026-10-20 17:22:26.376000,,False,,,,,
+U3,24,Tecnica,JavaScript,2026-10-18 14:28:48.424000,24,True,30.0,25.0,35.0,28.0,4
+U3,23,Tecnica,JavaScript,2026-10-19 14:28:48.424000,22,True,28.0,22.0,32.0,26.0,4
+U3,22,Tecnica,JavaScript,2026-10-20 14:28:48.424000,20,True,25.0,20.0,30.0,24.0,5
+U3,5,Tecnica,"Ingeniero Full Stack Senior - Node.js + React
+Buscamos un ingeniero con 5+ años de experiencia en:
+- Backend: Node.js, Express, PostgreSQL
+- Frontend: React, TypeScript, Tailwind
+- Integraciones API y microservicios
+Requisitos: trabajo en equipo, mentorship, toma de decisiones técnicas.",2026-10-20 15:34:56.875000,,False,,,,,
+U3,8,Tecnica,"Ingeniero Full Stack Senior - Node.js + React
+Buscamos un ingeniero con 5+ años de experiencia en:
+- Backend: Node.js, Express, PostgreSQL
+- Frontend: React, TypeScript, Tailwind
+- Integraciones API y microservicios
+Requisitos: trabajo en equipo, mentorship, toma de decisiones técnicas.",2026-10-20 17:11:58.811000,,False,,,,,
+U3,11,Tecnica,"Ingeniero Full Stack Senior - Node.js + React
+Buscamos un ingeniero con 5+ años de experiencia en:
+- Backend: Node.js, Express, PostgreSQL
+- Frontend: React, TypeScript, Tailwind
+- Integraciones API y microservicios
+Requisitos: trabajo en equipo, mentorship, toma de decisiones técnicas.",2026-10-20 17:21:20.121000,,False,,,,,
+U3,14,Tecnica,"Ingeniero Full Stack Senior - Node.js + React
+Buscamos un ingeniero con 5+ años de experiencia en:
+- Backend: Node.js, Express, PostgreSQL
+- Frontend: React, TypeScript, Tailwind
+- Integraciones API y microservicios
+Requisitos: trabajo en equipo, mentorship, toma de decisiones técnicas.",2026-10-20 17:22:47.326000,,False,,,,,

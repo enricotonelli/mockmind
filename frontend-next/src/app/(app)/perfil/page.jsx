@@ -7,6 +7,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useModoDemostracion } from '../../../hooks/useModoDemostracion';
 import Tarjeta from '../../../components/Tarjeta';
 import Boton from '../../../components/Boton';
+import ConectarLinkedIn from '../../../components/ConectarLinkedIn';
 
 function formatearFecha(iso) {
   return new Date(iso).toLocaleDateString('es-AR', {
@@ -31,10 +32,18 @@ function Perfil() {
   const router = useRouter();
   const [resumen, setResumen] = useState(null);
   const [reiniciando, setReiniciando] = useState(false);
+  const [datosLinkedInCargados, setDatosLinkedInCargados] = useState(false);
 
   useEffect(() => {
     apiSesiones.obtenerResumen().then(setResumen).catch(() => {});
   }, []);
+
+  const manejarDatosLinkedIn = (datos) => {
+    // Aquí puedes procesar los datos de LinkedIn
+    console.log('Datos de LinkedIn:', datos);
+    setDatosLinkedInCargados(true);
+    // Opcionalmente actualizar el perfil del usuario
+  };
 
   async function reiniciar() {
     setReiniciando(true);
@@ -73,6 +82,14 @@ function Perfil() {
           etiqueta="Punto más fuerte"
           valor={resumen?.mejorDimension?.nombre ?? '—'}
         />
+
+        <div className="mt-6 pt-6 border-t border-borde">
+          <h3 className="text-sm font-medium text-texto mb-3">Sincronizar con LinkedIn</h3>
+          <ConectarLinkedIn onDatosLinkedIn={manejarDatosLinkedIn} />
+          {datosLinkedInCargados && (
+            <p className="text-xs text-exito mt-2">✓ Datos de LinkedIn sincronizados</p>
+          )}
+        </div>
       </Tarjeta>
 
       {modoDemostracion && (
