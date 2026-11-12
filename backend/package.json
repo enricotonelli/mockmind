@@ -30,5 +30,6 @@
   "devDependencies": {
     "nodemon": "^3.1.7",
     "prisma": "^6.19.3"
-  }
+  },
+  "_rebuild_trigger": "2026-11-12-v2"
 }
