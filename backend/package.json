@@ -16,7 +16,7 @@
     "@ai-sdk/google": "^4.0.101",
     "@ai-sdk/openai": "^4.0.58",
     "@anthropic-ai/sdk": "^0.32.1",
-    "@prisma/client": "^5.22.0",
+    "@prisma/client": "^6.19.3",
     "ai": "^7.0.92",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
@@ -29,7 +29,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.7",
-    "prisma": "^5.22.0"
+    "prisma": "^6.19.3"
   }
 }
-# Force rebuild
