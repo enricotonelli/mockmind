@@ -6,7 +6,7 @@ const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Nunca se devuelve el hash de la contraseña al frontend.
 function sinPassword(usuario) {
-  const { password, ...resto } = usuario;
+  const { passwordHash, ...resto } = usuario;
   return resto;
 }
 
@@ -33,7 +33,7 @@ const registro = asincrono(async (req, res) => {
     data: {
       nombre: nombre.trim(),
       email: emailNormalizado,
-      password: await hashearPassword(password),
+      passwordHash: await hashearPassword(password),
     },
   });
 
@@ -59,7 +59,7 @@ const login = asincrono(async (req, res) => {
 
   // El mismo mensaje para "no existe" y "contraseña incorrecta": no hay que
   // darle a un atacante pistas sobre qué emails están registrados.
-  if (!usuario || !(await compararPassword(password, usuario.password))) {
+  if (!usuario || !(await compararPassword(password, usuario.passwordHash))) {
     throw new ErrorApi(401, 'Email o contraseña incorrectos.');
   }
 

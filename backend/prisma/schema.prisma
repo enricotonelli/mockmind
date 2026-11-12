@@ -25,7 +25,7 @@ model Usuario {
   id            Int      @id @default(autoincrement())
   nombre        String
   email         String   @unique
-  password      String
+  passwordHash  String   @map("password")
   fechaRegistro DateTime @default(now()) @map("fecha_registro")
   sesiones      Sesion[]
 
